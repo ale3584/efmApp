@@ -1,15 +1,30 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useMemo, useRef, useState } from "react"
-import { TextInput, TextStyle, ViewStyle } from "react-native"
+import { Dimensions, TextInput, TextStyle, ViewStyle } from "react-native"
 import { Button, Icon, Screen, Text, TextField, TextFieldAccessoryProps } from "../components"
 import { useStores } from "../models"
 import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
+import {
+  NativeBaseProvider,
+  Link,
+  Center,
+  Input,
+  Box,
+  FormControl,
+  WarningOutlineIcon,
+  Flex,
+} from "native-base"
+import { color } from "react-native-reanimated"
+import { flexbox } from "native-base/lib/typescript/theme/styled-system"
+import { FlatList } from "react-native-gesture-handler"
 
 interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
+  const { navigation } = _props
   const authPasswordInput = useRef<TextInput>()
+  const { height, width } = Dimensions.get("window")
 
   const [authPassword, setAuthPassword] = useState("")
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
@@ -43,6 +58,9 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
     // We'll mock this with a fake token.
     setAuthToken(String(Date.now()))
   }
+  function register() {
+    navigation.navigate("Register")
+  }
 
   const PasswordRightAccessory = useMemo(
     () =>
@@ -68,53 +86,60 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   }, [])
 
   return (
-    <Screen
-      preset="auto"
-      contentContainerStyle={$screenContentContainer}
-      safeAreaEdges={["top", "bottom"]}
-    >
-      <Text testID="login-heading" tx="loginScreen.signIn" preset="heading" style={$signIn} />
-      <Text tx="loginScreen.enterDetails" preset="subheading" style={$enterDetails} />
-      {attemptsCount > 2 && <Text tx="loginScreen.hint" size="sm" weight="light" style={$hint} />}
-
-      <TextField
-        value={authEmail}
-        onChangeText={setAuthEmail}
-        containerStyle={$textField}
-        autoCapitalize="none"
-        autoComplete="email"
-        autoCorrect={false}
-        keyboardType="email-address"
-        labelTx="loginScreen.emailFieldLabel"
-        placeholderTx="loginScreen.emailFieldPlaceholder"
-        helper={error}
-        status={error ? "error" : undefined}
-        onSubmitEditing={() => authPasswordInput.current?.focus()}
-      />
-
-      <TextField
-        ref={authPasswordInput}
-        value={authPassword}
-        onChangeText={setAuthPassword}
-        containerStyle={$textField}
-        autoCapitalize="none"
-        autoComplete="password"
-        autoCorrect={false}
-        secureTextEntry={isAuthPasswordHidden}
-        labelTx="loginScreen.passwordFieldLabel"
-        placeholderTx="loginScreen.passwordFieldPlaceholder"
-        onSubmitEditing={login}
-        RightAccessory={PasswordRightAccessory}
-      />
-
-      <Button
-        testID="login-button"
-        tx="loginScreen.tapToSignIn"
-        style={$tapButton}
-        preset="reversed"
-        onPress={login}
-      />
-    </Screen>
+    <NativeBaseProvider>
+      <Screen
+        preset="auto"
+        contentContainerStyle={$screenContentContainer}
+        safeAreaEdges={["top", "bottom"]}
+      >
+        {/* <Text testID="login-heading" tx="loginScreen.signIn" preset="heading" style={$signIn} /> */}
+        {/* <Text tx="loginScreen.enterDetails" preset="subheading" style={$enterDetails} /> */}
+        {attemptsCount > 2 && <Text tx="loginScreen.hint" size="sm" weight="light" style={$hint} />}
+        <Box style={$boxStyle} height={height / 2} borderWidth={10}>
+          <TextField
+            value={authEmail}
+            onChangeText={setAuthEmail}
+            containerStyle={$textField}
+            autoCapitalize="none"
+            autoComplete="email"
+            autoCorrect={false}
+            keyboardType="email-address"
+            labelTx="loginScreen.emailFieldLabel"
+            placeholderTx="loginScreen.emailFieldPlaceholder"
+            helper={error}
+            inputWrapperStyle={$testInput}
+            status={error ? "error" : undefined}
+            onSubmitEditing={() => authPasswordInput.current?.focus()}
+          />
+          <TextField
+            ref={authPasswordInput}
+            value={authPassword}
+            onChangeText={setAuthPassword}
+            containerStyle={$textField}
+            autoCapitalize="none"
+            autoComplete="password"
+            autoCorrect={false}
+            secureTextEntry={isAuthPasswordHidden}
+            labelTx="loginScreen.passwordFieldLabel"
+            placeholderTx="loginScreen.passwordFieldPlaceholder"
+            onSubmitEditing={login}
+            RightAccessory={PasswordRightAccessory}
+            style={$inputStyle}
+            inputWrapperStyle={$testInput}
+          />
+          <Button
+            testID="login-button"
+            tx="loginScreen.tapToSignIn"
+            style={$tapButton}
+            preset="reversed"
+            onPress={login}
+          />
+          <Center>
+            <Link onPress={register}>Register</Link>
+          </Center>
+        </Box>
+      </Screen>
+    </NativeBaseProvider>
   )
 })
 
@@ -123,12 +148,24 @@ const $screenContentContainer: ViewStyle = {
   paddingHorizontal: spacing.large,
 }
 
+const $boxStyle: ViewStyle = {}
+
+const $testInput: ViewStyle = {
+  borderLeftWidth: 0,
+  borderRightWidth: 0,
+  borderTopWidth: 0,
+}
+
 const $signIn: TextStyle = {
   marginBottom: spacing.small,
 }
 
 const $enterDetails: TextStyle = {
   marginBottom: spacing.large,
+  borderBottomColor: "#",
+}
+const $inputStyle: ViewStyle = {
+  borderColor: "#FF0000",
 }
 
 const $hint: TextStyle = {
@@ -138,10 +175,20 @@ const $hint: TextStyle = {
 
 const $textField: ViewStyle = {
   marginBottom: spacing.large,
+  borderColor: "red",
 }
 
 const $tapButton: ViewStyle = {
   marginTop: spacing.extraSmall,
+  borderRadius: 10,
+  backgroundColor: "#376AED",
+  shadowColor: "#000000",
+  shadowOpacity: 0.1,
+  shadowRadius: 1,
+  shadowOffset: { width: -2, height: 4 },
+}
+const $test: ViewStyle = {
+  backgroundColor: "#3d4db7",
 }
 
 // @demo remove-file
