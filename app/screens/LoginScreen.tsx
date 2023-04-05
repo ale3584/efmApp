@@ -1,23 +1,13 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useMemo, useRef, useState } from "react"
-import { Dimensions, TextInput, TextStyle, ViewStyle } from "react-native"
+import { Dimensions, TextInput, TextStyle, ViewStyle, StyleSheet, View } from "react-native"
 import { Button, Icon, Screen, Text, TextField, TextFieldAccessoryProps } from "../components"
 import { useStores } from "../models"
 import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
-import {
-  NativeBaseProvider,
-  Link,
-  Center,
-  Input,
-  Box,
-  FormControl,
-  WarningOutlineIcon,
-  Flex,
-} from "native-base"
-import { color } from "react-native-reanimated"
-import { flexbox } from "native-base/lib/typescript/theme/styled-system"
-import { FlatList } from "react-native-gesture-handler"
+import Svg, { Image } from "react-native-svg"
+import styles from "./styles/login"
+import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated"
 
 interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
 
@@ -25,7 +15,6 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   const { navigation } = _props
   const authPasswordInput = useRef<TextInput>()
   const { height, width } = Dimensions.get("window")
-
   const [authPassword, setAuthPassword] = useState("")
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -62,6 +51,14 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
     navigation.navigate("Register")
   }
 
+  const imagePosition = useSharedValue(1)
+
+  const imageAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: 1,
+    }
+  })
+
   const PasswordRightAccessory = useMemo(
     () =>
       function PasswordRightAccessory(props: TextFieldAccessoryProps) {
@@ -86,69 +83,101 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   }, [])
 
   return (
-    <NativeBaseProvider>
-      <Screen
-        preset="auto"
-        contentContainerStyle={$screenContentContainer}
-        safeAreaEdges={["top", "bottom"]}
-      >
-        {/* <Text testID="login-heading" tx="loginScreen.signIn" preset="heading" style={$signIn} /> */}
-        {/* <Text tx="loginScreen.enterDetails" preset="subheading" style={$enterDetails} /> */}
-        {attemptsCount > 2 && <Text tx="loginScreen.hint" size="sm" weight="light" style={$hint} />}
-        <Box style={$boxStyle} height={height / 2} borderWidth={10}>
-          <TextField
-            value={authEmail}
-            onChangeText={setAuthEmail}
-            containerStyle={$textField}
-            autoCapitalize="none"
-            autoComplete="email"
-            autoCorrect={false}
-            keyboardType="email-address"
-            labelTx="loginScreen.emailFieldLabel"
-            placeholderTx="loginScreen.emailFieldPlaceholder"
-            helper={error}
-            inputWrapperStyle={$testInput}
-            status={error ? "error" : undefined}
-            onSubmitEditing={() => authPasswordInput.current?.focus()}
-          />
-          <TextField
-            ref={authPasswordInput}
-            value={authPassword}
-            onChangeText={setAuthPassword}
-            containerStyle={$textField}
-            autoCapitalize="none"
-            autoComplete="password"
-            autoCorrect={false}
-            secureTextEntry={isAuthPasswordHidden}
-            labelTx="loginScreen.passwordFieldLabel"
-            placeholderTx="loginScreen.passwordFieldPlaceholder"
-            onSubmitEditing={login}
-            RightAccessory={PasswordRightAccessory}
-            style={$inputStyle}
-            inputWrapperStyle={$testInput}
-          />
+    // <NativeBaseProvider>
+    <Screen preset="auto">
+      <View style={styles.container}>
+        <Animated.View style={[StyleSheet.absoluteFill, imageAnimatedStyle]}>
+          <Svg width={width} height={height}>
+            <Image
+              href={require("../../assets/images/splash-logo-all.png")}
+              width={width}
+              height={height}
+              preserveAspectRatio="xMidYMid slice"
+            />
+          </Svg>
+          <View style={styles.closeButtonContainer}>
+            <Text>X</Text>
+          </View>
+        </Animated.View>
+        <View style={styles.bottomConteiner}>
+          <Button testID="login-button" style={styles.button} preset="reversed" onPress={login}>
+            <Text tx="loginScreen.tapToSignIn" style={styles.buttonText} />
+          </Button>
           <Button
-            testID="login-button"
-            tx="loginScreen.tapToSignIn"
-            style={$tapButton}
+            testID="register-button"
+            style={styles.button}
             preset="reversed"
-            onPress={login}
-          />
-          <Center>
-            <Link onPress={register}>Register</Link>
-          </Center>
-        </Box>
-      </Screen>
-    </NativeBaseProvider>
+            onPress={register}
+          >
+            <Text tx="loginScreen.tapToSignUp" style={styles.buttonText} />
+          </Button>
+        </View>
+        {/* <View style={styles.formInputConteiner}>
+            <TextField
+              containerStyle={$screenContentContainer}
+              value={authEmail}
+              onChangeText={setAuthEmail}
+              autoCapitalize="none"
+              autoComplete="email"
+              autoCorrect={false}
+              keyboardType="email-address"
+              labelTx="loginScreen.emailFieldLabel"
+              placeholderTx="loginScreen.emailFieldPlaceholder"
+              helper={error}
+              status={error ? "error" : undefined}
+              onSubmitEditing={() => authPasswordInput.current?.focus()}
+            />
+            <TextField
+              containerStyle={$screenContentContainer}
+              ref={authPasswordInput}
+              value={authPassword}
+              onChangeText={setAuthPassword}
+              autoCapitalize="none"
+              autoComplete="password"
+              autoCorrect={false}
+              secureTextEntry={isAuthPasswordHidden}
+              labelTx="loginScreen.passwordFieldLabel"
+              placeholderTx="loginScreen.passwordFieldPlaceholder"
+              onSubmitEditing={login}
+              RightAccessory={PasswordRightAccessory}
+            />
+            <TextField
+              containerStyle={$screenContentContainer}
+              ref={authPasswordInput}
+              value={authPassword}
+              onChangeText={setAuthPassword}
+              autoCapitalize="none"
+              autoComplete="password"
+              autoCorrect={false}
+              secureTextEntry={isAuthPasswordHidden}
+              labelTx="loginScreen.passwordFieldLabel"
+              placeholderTx="loginScreen.passwordFieldPlaceholder"
+              onSubmitEditing={login}
+              RightAccessory={PasswordRightAccessory}
+            />
+            <View style={styles.fotmButton}>
+              <Text style={$testInput}>LOG IN</Text>
+            </View>
+          </View> */}
+      </View>
+    </Screen>
+    // </NativeBaseProvider>
   )
 })
 
 const $screenContentContainer: ViewStyle = {
-  paddingVertical: spacing.huge,
-  paddingHorizontal: spacing.large,
+  // paddingVertical: spacing.small,
+  // paddingHorizontal: spacing.large,
+  marginHorizontal: spacing.small,
+  marginVertical: spacing.large,
+  height: 50,
+  borderRadius: 25,
+  paddingLeft: 10,
 }
 
-const $boxStyle: ViewStyle = {}
+const $boxStyle: ViewStyle = {
+  backgroundColor: "#FFC93C",
+}
 
 const $testInput: ViewStyle = {
   borderLeftWidth: 0,
