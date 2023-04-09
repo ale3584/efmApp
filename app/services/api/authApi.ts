@@ -1,7 +1,7 @@
 import { ApiResponse } from "apisauce";
 import { Api } from "./api";
 import { getGeneralApiProblem } from "./apiProblem";
-import { LoginFullResult, LogoutResult } from "./api.types";
+import { LoginFullResult, LogoutResult, RegisterResult } from "./api.types";
 
 export class AuthenticationApi {
   private api: Api;
@@ -43,6 +43,26 @@ export class AuthenticationApi {
         kind: {kind:"bad-data"},
         roles: []
       }
+    }
+  }
+
+  async signup(username: string, email:string,  password: string): Promise<RegisterResult> {
+    try {
+      const response: ApiResponse<any> = await this.api.apisauce.post(
+        "/auth/signup",
+        { username, email, password }
+      );
+
+      if (!response.ok) {
+        const problem = getGeneralApiProblem(response);
+        if (problem) return problem;
+      }
+      
+     
+      return {kind: "ok"}
+    } catch (e) {
+      __DEV__ && console.tron.log(e.message);
+      return {kind:"bad-data"}
     }
   }
 

@@ -2,7 +2,7 @@ import { Instance, SnapshotIn, SnapshotOut, flow, types } from "mobx-state-tree"
 import { withSetPropAction } from "./helpers/withSetPropAction"
 import { withStatus } from "../extensions/with-status"
 import { AuthenticationApi } from "app/services/api/authApi"
-import { LoginFullResult, LogoutResult, api } from "app/services/api"
+import { LoginFullResult, LogoutResult, RegisterResult, api } from "app/services/api"
 
 /**
  * Model description here for TypeScript hints.
@@ -67,6 +67,28 @@ export const AuthStoreModel = types
         self.setAuthenticated(true);
         self.setAuthToken(result.accessToken);
         self.setRefreshToken(result.refreshToken);
+      } else {
+        self.setStatus("error");
+        self.setAuthenticated(false);
+        __DEV__ && console.tron.log(result.kind);
+      }
+    }),
+    signup: flow(function* (username: string, emailAddress: string, password: string) {
+      self.setStatus("pending");
+
+      const authenticationApi = new AuthenticationApi(api);
+      const result: RegisterResult = yield authenticationApi.signup(
+        username,
+        emailAddress,
+        password
+      );
+
+      if (result.kind === "ok") {
+        self.setStatus("done");
+        
+        // self.setAuthenticated(true);
+        // self.setAuthToken(result.accessToken);
+        // self.setRefreshToken(result.refreshToken);
       } else {
         self.setStatus("error");
         self.setAuthenticated(false);

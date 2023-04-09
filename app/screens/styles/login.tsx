@@ -1,7 +1,5 @@
 import { spacing } from "../../theme"
-import { StyleSheet, Dimensions } from "react-native"
-
-const { height } = Dimensions.get("window")
+import { StyleSheet } from "react-native"
 
 const styles = StyleSheet.create({
   // eslint-disable-next-line react-native/no-color-literals
@@ -22,7 +20,10 @@ const styles = StyleSheet.create({
 
   // eslint-disable-next-line react-native/no-color-literals
   buttonRegister: {
+    alignContent: "center",
     alignItems: "center",
+    alignSelf: "center",
+
     backgroundColor: "#FFC93C",
     borderColor: "#FFC93C",
     // borderRadius: 35,
@@ -31,6 +32,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginTop: spacing.extraSmall,
     marginVertical: 10,
+    textAlign: "center",
+
     // shadowColor: "#000000",
     // shadowOpacity: 0.1,
     // shadowRadius: 1,
@@ -58,16 +61,20 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
-  bottomConteiner: {
+  bottomContainer: {
     // height: height / 3,
     justifyContent: "center",
-    marginBottom: 30,
+    //marginBottom: 70,
   },
 
   formInputContainer: {
     justifyContent: "center",
-    marginBottom: 70,
+    marginBottom: 15,
     // zIndex: -1,
+  },
+  // eslint-disable-next-line react-native/no-color-literals
+  screen: {
+    backgroundColor: "#FFC93C",
   },
 })
 

@@ -58,4 +58,5 @@ export type LoginFullResult = {
   kind: "ok" | void | GeneralApiProblem,
   roles: string[],
 }
+export type RegisterResult = { kind: "ok" } | GeneralApiProblem;
 export type LogoutResult = { kind: "ok" } | GeneralApiProblem;

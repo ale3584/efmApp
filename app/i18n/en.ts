@@ -34,14 +34,28 @@ const en = {
     signIn: "Sign In",
     enterDetails:
       "Enter your details below to unlock top secret info. You'll never guess what we've got waiting. Or maybe you will; it's not rocket science here.",
-    emailFieldLabel: "Email",
     userFieldLabel: "User name",
     passwordFieldLabel: "Password",
-    emailFieldPlaceholder: "Enter your user name",
-    passwordFieldPlaceholder: "Super secret password here",
+    userFieldPlaceholder: "Enter your user name",
+    passwordFieldPlaceholder: "Enter your password here",
     tapToSignIn: "Login",
     tapToSignUp: "Register",
     hint: "Hint: you can use any email address and your favorite password :)",
+  },
+  registerScreen: {
+    signUp: "Register",
+    enterDetails:
+      "Enter your details below to unlock top secret info. You'll never guess what we've got waiting. Or maybe you will; it's not rocket science here.",
+    emailFieldLabel: "Email",
+    userFieldLabel: "User name",
+    passwordFieldLabel: "Password",
+    emailFieldPlaceholder: "Enter your email address",
+    userFieldPlaceholder: "Enter your user name",
+    passwordFieldPlaceholder: "Enter your password",
+    tapToSignUp: "Register",
+    hint: "Hint: you can use any email address and your favorite password :)",
+    verificationSent: "We sent verification to your Email. Verify your account and login.",
+    dearCustomer: "Dear customer"
   },
   demoNavigator: {
     componentsTab: "Components",

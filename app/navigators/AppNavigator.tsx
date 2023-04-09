@@ -19,7 +19,7 @@ import Config from "../config"
 import { useStores } from "../models" // @demo remove-current-line
 import {
   LoginScreen, // @demo remove-current-line
-  WelcomeScreen,
+  HomeScreen,
   RegisterScreen,
 } from "../screens"
 import { DemoNavigator, DemoTabParamList } from "./DemoNavigator" // @demo remove-current-line
@@ -39,7 +39,7 @@ import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
  *   https://reactnavigation.org/docs/typescript/#organizing-types
  */
 export type AppStackParamList = {
-  Welcome: undefined
+  Home: undefined
   Login: undefined // @demo remove-current-line
   Register: undefined
   Demo: NavigatorScreenParams<DemoTabParamList> // @demo remove-current-line
@@ -70,11 +70,11 @@ const AppStack = observer(function AppStack() {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName={isAuthenticated ? "Welcome" : "Login"} // @demo remove-current-line
+      initialRouteName={isAuthenticated ? "Home" : "Login"} // @demo remove-current-line
     >
       {isAuthenticated ? (
         <>
-          <Stack.Screen name="Welcome" component={WelcomeScreen} />
+          <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Demo" component={DemoNavigator} />
         </>
       ) : (

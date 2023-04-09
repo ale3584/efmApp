@@ -23,16 +23,9 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
     authStore: { authUser, setAuthUser, validationError },
   } = useStores()
 
-  useEffect(() => {
-    // Here is where you could fetch credentials from keychain or storage
-    // and pre-fill the form fields.
-    setAuthUser("test")
-    setAuthPassword("Password12")
-  }, [])
-
   const error = isSubmitted ? validationError : ""
 
-  const onLogin = async (emailAddress, password) => await authStore.login(emailAddress, password)
+  const onLogin = async (userName, password) => await authStore.login(userName, password)
 
   function register() {
     navigation.navigate("Register")
@@ -63,7 +56,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
 
   return (
     <NativeBaseProvider>
-      <Screen preset="auto">
+      <Screen preset="auto" style={styles.screen}>
         <View style={styles.container}>
           <View>
             <Svg width={width} height={height / 2}>
@@ -105,7 +98,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
               RightAccessory={PasswordRightAccessory}
             />
           </View>
-          <View style={styles.bottomConteiner}>
+          <View style={styles.bottomContainer}>
             <Button
               testID="login-button"
               style={styles.button}
@@ -118,9 +111,11 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                 style={styles.buttonText}
               />
             </Button>
-            <Button testID="register-button" style={styles.buttonRegister} onPress={register}>
-              <Text tx="loginScreen.tapToSignUp" style={styles.buttonTextRegister} />
-            </Button>
+            <Text
+              tx="loginScreen.tapToSignUp"
+              style={[styles.buttonTextRegister, styles.buttonRegister]}
+              onPress={register}
+            />
           </View>
         </View>
       </Screen>
