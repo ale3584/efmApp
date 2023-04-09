@@ -28,15 +28,16 @@ const en = {
   },
   // @demo remove-block-start
   errors: {
-    invalidEmail: "Invalid email address.",
+    invalidEmail: "Invalid user name.",
   },
   loginScreen: {
     signIn: "Sign In",
     enterDetails:
       "Enter your details below to unlock top secret info. You'll never guess what we've got waiting. Or maybe you will; it's not rocket science here.",
     emailFieldLabel: "Email",
+    userFieldLabel: "User name",
     passwordFieldLabel: "Password",
-    emailFieldPlaceholder: "Enter your email address",
+    emailFieldPlaceholder: "Enter your user name",
     passwordFieldPlaceholder: "Super secret password here",
     tapToSignIn: "Login",
     tapToSignUp: "Register",

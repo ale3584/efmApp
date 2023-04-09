@@ -64,6 +64,8 @@
     "mobx-state-tree": "5.1.5",
     "native-base": "^3.4.28",
     "react": "18.1.0",
+    "react-devtools": "^4.27.4",
+    "react-hook-form": "^7.43.9",
     "react-native": "0.70.5",
     "react-native-bootsplash": "4.3.2",
     "react-native-gesture-handler": "~2.9.0",

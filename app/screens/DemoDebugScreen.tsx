@@ -15,7 +15,7 @@ export const DemoDebugScreen: FC<DemoTabScreenProps<"DemoDebug">> = function Dem
   _props,
 ) {
   const {
-    authenticationStore: { logout },
+    authStore: { logout },
   } = useStores()
 
   const usingHermes = typeof HermesInternal === "object" && HermesInternal !== null

@@ -48,6 +48,8 @@ export class Api {
     })
   }
 
+
+
   // @demo remove-block-start
   /**
    * Gets a list of recent React Native Radio episodes.
@@ -81,7 +83,26 @@ export class Api {
       return { kind: "bad-data" }
     }
   }
+
   // @demo remove-block-end
+
+  setAuthToken = (token: string) => {
+    this.apisauce.headers.Authorization = ''
+    delete this.apisauce.headers.Authorization;
+  
+    if (token) {
+      this.apisauce.headers.Authorization = `Bearer ${token}`
+    }
+  }
+
+  setRefreshToken = (token: string) =>{
+    this.apisauce.headers.refreshToken = ''
+    delete this.apisauce.headers.refreshToken
+  
+    if (token) {
+      this.apisauce.headers.refreshToken = token
+    }
+  }
 }
 
 // Singleton instance of the API for convenience

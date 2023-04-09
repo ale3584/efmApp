@@ -1,3 +1,5 @@
+import { GeneralApiProblem } from "./apiProblem"
+
 /**
  * These types indicate the shape of the data you expect to receive from your
  * API endpoint, assuming it's a JSON object like we have.
@@ -48,3 +50,12 @@ export interface ApiConfig {
    */
   timeout: number
 }
+
+export type LoginResult = { kind: "ok" } | GeneralApiProblem;
+export type LoginFullResult = { 
+  refreshToken: "",
+  accessToken:"",
+  kind: "ok" | void | GeneralApiProblem,
+  roles: string[],
+}
+export type LogoutResult = { kind: "ok" } | GeneralApiProblem;

@@ -1,75 +1,73 @@
-import { colors, spacing } from "../../theme"
+import { spacing } from "../../theme"
 import { StyleSheet, Dimensions } from "react-native"
 
-const { height, width } = Dimensions.get("window")
+const { height } = Dimensions.get("window")
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    // alignItems: "center",
-    justifyContent: "flex-end",
-  },
+  // eslint-disable-next-line react-native/no-color-literals
   button: {
-    marginTop: spacing.extraSmall,
-    backgroundColor: "#376AED",
-    height: 55,
     alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 35,
+    backgroundColor: "#376AED",
     borderColor: "#FFFFFF",
+    borderRadius: 35,
+    height: 55,
+    justifyContent: "center",
     marginHorizontal: 20,
+    marginTop: spacing.extraSmall,
     marginVertical: 10,
     shadowColor: "#000000",
     shadowOpacity: 0.1,
     shadowRadius: 1,
   },
+
+  // eslint-disable-next-line react-native/no-color-literals
+  buttonRegister: {
+    alignItems: "center",
+    backgroundColor: "#FFC93C",
+    borderColor: "#FFC93C",
+    // borderRadius: 35,
+    height: 55,
+    justifyContent: "center",
+    marginHorizontal: 20,
+    marginTop: spacing.extraSmall,
+    marginVertical: 10,
+    // shadowColor: "#000000",
+    // shadowOpacity: 0.1,
+    // shadowRadius: 1,
+  },
+
+  // eslint-disable-next-line react-native/no-color-literals
+  container: {
+    backgroundColor: "#FFC93C",
+    flex: 1,
+    // alignItems: "center",
+    justifyContent: "flex-end",
+  },
+
+  // eslint-disable-next-line react-native/no-color-literals
+
+  // eslint-disable-next-line react-native/sort-styles, react-native/no-color-literals
   buttonText: {
     color: "#FFFFFF",
+    fontWeight: "bold",
   },
+
+  // eslint-disable-next-line react-native/no-color-literals
+  buttonTextRegister: {
+    color: "#376AED",
+    fontWeight: "bold",
+  },
+
   bottomConteiner: {
+    // height: height / 3,
     justifyContent: "center",
-    height: height / 2,
+    marginBottom: 30,
   },
-  fotmButton: {
-    marginTop: spacing.large,
-    backgroundColor: "#376AED",
-    height: 55,
-    alignItems: "center",
+
+  formInputContainer: {
     justifyContent: "center",
-    borderRadius: 35,
-    borderColor: "#FFFFFF",
-    marginHorizontal: 20,
-    marginVertical: 10,
-    borderWidth: 1,
-    shadowColor: "#000000",
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    elevation: 5,
-  },
-  formInputConteiner: {
     marginBottom: 70,
-  },
-  closeButtonContainer: {
-    height: 40,
-    width: 40,
-    justifyContent: "center",
-    alignSelf: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.34,
-    shadowRadius: 6.27,
-    elevation: 1,
-    backgroundColor: "white",
-    alignItems: "center",
-    borderRadius: 20,
+    // zIndex: -1,
   },
 })
 
