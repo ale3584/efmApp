@@ -1,10 +1,11 @@
 import React, { FC } from "react"
 import { observer } from "mobx-react-lite"
-import { Image, ScrollView, StyleSheet, View, Animated } from "react-native"
-import { AppStackScreenProps } from "app/navigators"
+import { Image, ScrollView, StyleSheet, View } from "react-native"
+import { AppStackScreenProps } from "../navigators"
 import { Screen, Text } from "app/components"
 import { AntDesign } from "@expo/vector-icons"
 import { ITEM_HEIGHT, SPACING, width, height } from "./HomeScreen"
+import * as Animatable from "react-native-animatable"
 
 interface PlayerDetailsScreenProps extends AppStackScreenProps<"PlayerDetails"> {}
 
@@ -15,7 +16,7 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
   function PlayerDetailsScreen({ navigation, route }) {
     const { item } = route.params
     return (
-      <Screen safeAreaEdges={["top", "bottom"]} preset="fixed" style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <AntDesign
           name="arrowleft"
           size={28}
@@ -40,7 +41,7 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
               backgroundColor: "grey",
               borderRadius: 16,
               padding: SPACING,
-              height: TOP_HEADER_HEIGHT + 38,
+              height: TOP_HEADER_HEIGHT + 32,
             },
           ]}
         >
@@ -50,9 +51,11 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
             source={{ uri: "https://api.efootballdb.com/assets/2022/players/7511_.png" }}
           />
           <View style={styles.bg}>
-            <ScrollView>
+            <ScrollView style={{ flex: 1 }}>
               <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-                <Animated.View
+                <Animatable.View
+                  animation="bounceIn"
+                  delay={1 + 1 * 100}
                   // eslint-disable-next-line react-native/no-inline-styles, react-native/no-color-literals
                   style={{
                     backgroundColor: "blue",
@@ -64,8 +67,10 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
                   }}
                 >
                   <AntDesign name="home" size={24} color={"white"} />
-                </Animated.View>
-                <Animated.View
+                </Animatable.View>
+                <Animatable.View
+                  animation="bounceIn"
+                  delay={1 + 2 * 100}
                   // eslint-disable-next-line react-native/no-inline-styles, react-native/no-color-literals
                   style={{
                     backgroundColor: "yellow",
@@ -77,8 +82,10 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
                   }}
                 >
                   <AntDesign name="antdesign" size={24} color={"white"} />
-                </Animated.View>
-                <Animated.View
+                </Animatable.View>
+                <Animatable.View
+                  animation="bounceIn"
+                  delay={1 + 3 * 100}
                   // eslint-disable-next-line react-native/no-inline-styles, react-native/no-color-literals
                   style={{
                     backgroundColor: "pink",
@@ -90,7 +97,7 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
                   }}
                 >
                   <AntDesign name="book" size={24} color={"white"} />
-                </Animated.View>
+                </Animatable.View>
               </View>
               <View>
                 <Text>Content</Text>
@@ -98,7 +105,7 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
             </ScrollView>
           </View>
         </View>
-      </Screen>
+      </View>
     )
   },
 )
@@ -116,11 +123,6 @@ const styles = StyleSheet.create({
     width,
   },
   // eslint-disable-next-line react-native/no-color-literals
-  box: {
-    backgroundColor: "#61dafb",
-    borderRadius: 4,
-    marginTop: 32,
-  },
   image: {
     height: ITEM_HEIGHT * 0.8,
     position: "absolute",

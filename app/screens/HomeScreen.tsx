@@ -6,6 +6,7 @@ import { Button, Screen, Text } from "../components"
 import { useStores } from "../models"
 import { FlashList } from "@shopify/flash-list"
 import { FlatList } from "native-base"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 interface HomeScreenProps extends AppStackScreenProps<"Home"> {}
 
@@ -27,15 +28,15 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
   }
 
   return (
-    <Screen safeAreaEdges={["top", "bottom"]} style={$root} preset="scroll">
-      {/* <Button onPress={logout}>
+    <Screen safeAreaEdges={["top", "bottom"]} preset="scroll" style={$root}>
+      <Button onPress={logout}>
         <Text>Logout</Text>
       </Button>
       <Button onPress={() => onfetchPlayers(refreshToken, authToken)}>
         <Text>Fetch</Text>
-      </Button> */}
+      </Button>
       <View style={{ flex: 1 }}>
-        <FlatList
+        <FlashList
           data={playerStore.players}
           keyExtractor={(item) => `${item.id}`}
           contentContainerStyle={{ padding: SPACING }}
@@ -64,6 +65,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
               </View>
             </TouchableOpacity>
           )}
+          estimatedItemSize={10}
         />
         {/* <View style={styles.bg} /> */}
       </View>
@@ -77,14 +79,6 @@ const $root: ViewStyle = {
 
 const styles = StyleSheet.create({
   // eslint-disable-next-line react-native/no-color-literals
-  bg: {
-    backgroundColor: "red",
-    borderRadius: 32,
-    height,
-    position: "absolute",
-    transform: [{ translateY: height }],
-    width,
-  },
   image: {
     bottom: 0,
     height: ITEM_HEIGHT * 0.8,
@@ -94,7 +88,7 @@ const styles = StyleSheet.create({
     width: ITEM_HEIGHT * 0.8,
   },
   name: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "700",
   },
 })
