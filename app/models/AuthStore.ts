@@ -1,8 +1,8 @@
 import { Instance, SnapshotIn, SnapshotOut, flow, types } from "mobx-state-tree"
 import { withSetPropAction } from "./helpers/withSetPropAction"
 import { withStatus } from "../extensions/with-status"
-import { AuthenticationApi } from "app/services/api/authApi"
-import { LoginFullResult, LogoutResult, RegisterResult, api } from "app/services/api"
+import { AuthenticationApi } from "../services/api/authApi"
+import { LoginFullResult, LogoutResult, RegisterResult, api, refreshTokenResult } from "../services/api"
 
 /**
  * Model description here for TypeScript hints.
@@ -34,22 +34,17 @@ export const AuthStoreModel = types
     setAuthenticated(value: boolean) {
       self.isAuthenticated = value;
     },
-    setAuthEmail(value: string) {
-      self.authEmail = value.replace(/ /g, "")
-    },
-    setAuthUser(value: string) {
-      self.authUser = value.replace(/ /g, "")
-    },
-  }))
-  .actions((self) => ({
-    setAuthenticated(value: boolean) {
-      self.isAuthenticated = value;
-    },
     setAuthToken(value?: string) {
       self.authToken = value
     },
     setRefreshToken(value?: string) {
       self.refreshToken = value
+    },
+    setAuthEmail(value: string) {
+      self.authEmail = value.replace(/ /g, "")
+    },
+    setAuthUser(value: string) {
+      self.authUser = value.replace(/ /g, "")
     },
   }))
   .actions((self) => ({
@@ -105,15 +100,36 @@ export const AuthStoreModel = types
       if (result.kind === "ok") {
         self.setStatus("done");
         self.setAuthenticated(false);
-        self.authToken = undefined;
-        self.refreshToken = undefined;
+        self.authToken = "";
+        self.refreshToken = "";
         self.authEmail = "";
       } else {
         self.setStatus("error");
         self.setAuthenticated(false);
         __DEV__ && console.tron.log(result.kind);
       }
-    })
+    }),
+    refToken: flow(function* () {
+      self.setStatus("pending");
+
+      const authenticationApi = new AuthenticationApi(api);
+      const result: refreshTokenResult = yield authenticationApi.refreshToken(self.refreshToken);
+
+      console.log(result)
+      if (result.kind === "ok") {
+        self.setStatus("done");
+        self.setAuthenticated(true);
+        self.setAuthToken(result.accessToken);
+        self.setRefreshToken(result.refreshToken);
+      } else {
+        self.setStatus("error");
+        self.setAuthenticated(false);
+        self.authToken = "";
+        self.refreshToken = "";
+        self.authEmail = "";
+        __DEV__ && console.tron.log(result.kind);
+      }
+    }),
   }))
 
 export interface AuthStore extends Instance<typeof AuthStoreModel> {}

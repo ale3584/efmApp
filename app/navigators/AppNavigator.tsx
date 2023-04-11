@@ -21,6 +21,7 @@ import {
   LoginScreen, // @demo remove-current-line
   HomeScreen,
   RegisterScreen,
+  PlayerDetailsScreen,
 } from "../screens"
 import { DemoNavigator, DemoTabParamList } from "./DemoNavigator" // @demo remove-current-line
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
@@ -42,6 +43,7 @@ export type AppStackParamList = {
   Home: undefined
   Login: undefined // @demo remove-current-line
   Register: undefined
+  PlayerDetails: undefined
   Demo: NavigatorScreenParams<DemoTabParamList> // @demo remove-current-line
   // 🔥 Your screens go here
 }
@@ -75,7 +77,7 @@ const AppStack = observer(function AppStack() {
       {isAuthenticated ? (
         <>
           <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="Demo" component={DemoNavigator} />
+          <Stack.Screen name="PlayerDetails" component={PlayerDetailsScreen} />
         </>
       ) : (
         <>

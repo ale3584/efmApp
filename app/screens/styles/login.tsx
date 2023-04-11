@@ -76,6 +76,7 @@ const styles = StyleSheet.create({
   screen: {
     backgroundColor: "#FFC93C",
   },
+  bg: {},
 })
 
 export default styles

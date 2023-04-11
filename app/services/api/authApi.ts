@@ -1,11 +1,12 @@
 import { ApiResponse } from "apisauce";
 import { Api } from "./api";
-import { getGeneralApiProblem } from "./apiProblem";
-import { LoginFullResult, LogoutResult, RegisterResult } from "./api.types";
+import { GeneralApiProblem, getGeneralApiProblem } from "./apiProblem";
+import { ApiPlayersResponse, LoginFullResult, LogoutResult, RegisterResult, refreshTokenResult } from "./api.types";
+import { PlayerSnapshotIn } from "../../models/Player";
+import { useStores } from "app/models";
 
 export class AuthenticationApi {
   private api: Api;
-
   constructor(api: Api) {
     this.api = api;
   }
@@ -83,6 +84,65 @@ export class AuthenticationApi {
     } catch (e) {
       __DEV__ && console.tron.log(e.message);
       return { kind: "bad-data" };
+    }
+  }
+
+  async refreshToken(refToken:string): Promise<refreshTokenResult> {
+    const  refreshRes: refreshTokenResult = {
+      refreshToken: "",
+      accessToken:"",
+      kind: "ok",
+    };
+
+    this.api.setAuthToken(refToken);
+    const response: ApiResponse<any> = await this.api.apisauce.post(
+      "/auth/refreshtoken"
+    );
+
+    if (!response.ok) {
+      const problem = getGeneralApiProblem(response)
+      if (problem) {
+        refreshRes.kind = "ok"
+        return refreshRes
+      }
+    }
+
+    refreshRes.accessToken = response.data.accessToken;
+    refreshRes.refreshToken = response.data.refreshToken;
+    refreshRes.kind = "ok";
+
+    return refreshRes
+  }
+
+  async getPlayers(refreshToken: string, accessToken: string): Promise<{ kind: "ok"; players: PlayerSnapshotIn[] } | GeneralApiProblem> {
+
+    this.api.setAuthToken(accessToken);
+    this.api.setRefreshToken(refreshToken);
+    const response: ApiResponse<ApiPlayersResponse> = await this.api.apisauce.get(
+      "/players",
+    )
+
+    // the typical ways to die when calling an api
+    if (!response.ok) {
+      const problem = getGeneralApiProblem(response)
+      if (problem) return problem
+    }     
+
+    // transform the data into the format we are expecting
+    try {
+      const rawData = response.data
+
+      // This is where we transform the data into the shape we expect for our MST model.
+      const players: PlayerSnapshotIn[] = rawData.content.map((raw) => ({
+        ...raw,
+      }))
+
+      return { kind: "ok", players }
+    } catch (e) {
+      if (__DEV__) {
+        console.tron.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
+      }
+      return { kind: "bad-data" }
     }
   }
 }

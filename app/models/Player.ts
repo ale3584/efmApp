@@ -1,71 +1,7 @@
-import { GeneralApiProblem } from "./apiProblem"
+import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree"
+import { withSetPropAction } from "./helpers/withSetPropAction"
 
-/**
- * These types indicate the shape of the data you expect to receive from your
- * API endpoint, assuming it's a JSON object like we have.
- */
-export interface EpisodeItem {
-  title: string
-  pubDate: string
-  link: string
-  guid: string
-  author: string
-  thumbnail: string
-  description: string
-  content: string
-  enclosure: {
-    link: string
-    type: string
-    length: number
-    duration: number
-    rating: { scheme: string; value: string }
-  }
-  categories: string[]
-}
-
-export interface ApiFeedResponse {
-  status: string
-  feed: {
-    url: string
-    title: string
-    link: string
-    author: string
-    description: string
-    image: string
-  }
-  items: EpisodeItem[]
-}
-
-/**
- * The options used to configure apisauce.
- */
-export interface ApiConfig {
-  /**
-   * The URL of the api.
-   */
-  url: string
-
-  /**
-   * Milliseconds before we timeout the request.
-   */
-  timeout: number
-}
-
-export type LoginResult = { kind: "ok" } | GeneralApiProblem;
-export type LoginFullResult = { 
-  refreshToken: "",
-  accessToken:"",
-  kind: "ok" | void | GeneralApiProblem,
-  roles: string[],
-}
-export type refreshTokenResult = {
-  refreshToken: "",
-  accessToken:"",
-  kind: "ok" | void | GeneralApiProblem,
-}
-export type RegisterResult = { kind: "ok" } | GeneralApiProblem;
-export type LogoutResult = { kind: "ok" } | GeneralApiProblem;
-export interface playedPositions {
+interface playedPositions {
   id: number,
   gk: number,
   cb: number,
@@ -81,7 +17,7 @@ export interface playedPositions {
   ss: number,
   cf: number
 }
-export interface  playedPositionsRating {
+interface playedPositionsRating  {
   id: number,
   overallGK: number,
   overallCB: number,
@@ -97,7 +33,7 @@ export interface  playedPositionsRating {
   overallSS: number,
   overallCF: number,
 }
-export interface teamPlayStyle {
+interface teamPlayStyle {
   id: number,
   possessiongame: number,
   quickcounter: number,
@@ -105,7 +41,7 @@ export interface teamPlayStyle {
   outwide: number,
   longball: number,
 }
-export interface playerSkills {
+interface playerSkills {
   id: number,
   scissorsfeint: number,
   doubletouch: number,
@@ -153,7 +89,7 @@ export interface playerSkills {
   slidingtackle: number
 }
 
-export interface playerStylesAI {
+interface playerStylesAI {
   id: number,
   trickster: number,
   mazingrun: number,
@@ -163,7 +99,7 @@ export interface playerStylesAI {
   earlycross: number,
   longrange: number
 }
-export interface playerAbility {
+interface playerAbility {
   id: number,
   offensiveawareness: number,
   ballcontrol: number,
@@ -198,7 +134,7 @@ export interface playerAbility {
   playingattitude: number,
   balance: number
 }
-export interface playerBasicInfo {
+interface playerBasicInfo {
   id: number,
   club: number,
   team: {
@@ -228,54 +164,35 @@ export interface playerBasicInfo {
   age: number
 }
 
-export interface Player {
-  id: number,
-  accentedName: string,
-  name: string,
-  shirt: string,
-  shirtNational: string,
-  strongerFoot: number,
-  playingStyles: number,
-  registeredPosition: number,
-  overall: number,
-  overallpotential: number,
-  levelcap: number,
-  playertype: number,
-  condition: number,
-  playedPositions: playedPositions,
-  playedPositionsRating: playedPositionsRating,
-  teamPlayStyle: teamPlayStyle,
-  playerSkills: playerSkills,
-  playerStylesAI: playerStylesAI,
-  playerAbility: playerAbility,
-  playerBasicInfo: playerBasicInfo
-}
+export const PlayerModel = types
+  .model("Player")
+  .props({
+    id: 0,
+    accentedName: "",
+    name: "",
+    shirt: "",
+    shirtNational: "",
+    strongerFoot: 0,
+    playingStyles: 0,
+    registeredPosition: 0,
+    overall: 0,
+    overallpotential: 0,
+    levelcap: 0,
+    playertype: 0,
+    condition: 0,
+    playedPositions:  types.frozen<playedPositions>(),
+    playedPositionsRating: types.frozen<playedPositionsRating>(),
+    teamPlayStyle: types.frozen<teamPlayStyle>(),
+    playerSkills: types.frozen<playerSkills>(),
+    playerStylesAI: types.frozen<playerStylesAI>(),
+    playerAbility: types.frozen<playerAbility>(),
+    playerBasicInfo: types.frozen<playerBasicInfo>(),
+  })
+  .actions(withSetPropAction)
+  .views((self) => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
+  .actions((self) => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
 
-export interface ApiPlayersResponse {
-  status: string,
-  content: Player[],
-  pageable: {
-    sort: {
-      empty: boolean,
-      sorted: boolean,
-      unsorted: boolean
-    },
-    offset: number,
-    pageNumber: number,
-    pageSize: number,
-    paged: boolean,
-    unpaged: boolean},
-  last: boolean,
-  totalElements: number,
-  totalPages: number,
-  size: number,
-  number: number,
-  sort: {
-      empty: boolean,
-      sorted: boolean,
-      unsorted: boolean
-  },
-  numberOfElements: number,
-  first: boolean,
-  empty: boolean,
-}
+export interface Player extends Instance<typeof PlayerModel> {}
+export interface PlayerSnapshotOut extends SnapshotOut<typeof PlayerModel> {}
+export interface PlayerSnapshotIn extends SnapshotIn<typeof PlayerModel> {}
+export const createPlayerDefaultModel = () => types.optional(PlayerModel, {})
