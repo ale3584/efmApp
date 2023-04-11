@@ -63,7 +63,7 @@ export const RegisterScreen: FC<RegisterScreenProps> = observer(function Registe
   // const navigation = useNavigation()
   return (
     <NativeBaseProvider>
-      <Screen preset="auto" style={styles.screen}>
+      <Screen safeAreaEdges={["top", "bottom"]} preset="auto" style={styles.screen}>
         <View style={styles.container}>
           <View>
             <Svg width={width} height={height / 2}>

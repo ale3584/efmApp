@@ -5,6 +5,7 @@ import { AppStackScreenProps } from "../navigators"
 import { Button, Screen, Text } from "../components"
 import { useStores } from "../models"
 import { FlashList } from "@shopify/flash-list"
+import { FlatList } from "native-base"
 
 interface HomeScreenProps extends AppStackScreenProps<"Home"> {}
 
@@ -26,16 +27,15 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
   }
 
   return (
-    <Screen style={$root} preset="scroll">
-      <Text text="home" />
-      <Button onPress={logout}>
+    <Screen safeAreaEdges={["top", "bottom"]} style={$root} preset="scroll">
+      {/* <Button onPress={logout}>
         <Text>Logout</Text>
       </Button>
       <Button onPress={() => onfetchPlayers(refreshToken, authToken)}>
         <Text>Fetch</Text>
-      </Button>
+      </Button> */}
       <View style={{ flex: 1 }}>
-        <FlashList
+        <FlatList
           data={playerStore.players}
           keyExtractor={(item) => `${item.id}`}
           contentContainerStyle={{ padding: SPACING }}
@@ -64,9 +64,8 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
               </View>
             </TouchableOpacity>
           )}
-          estimatedItemSize={10}
         />
-        <View style={styles.bg} />
+        {/* <View style={styles.bg} /> */}
       </View>
     </Screen>
   )

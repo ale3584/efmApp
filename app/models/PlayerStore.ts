@@ -3,7 +3,6 @@ import { withSetPropAction } from "./helpers/withSetPropAction"
 import { PlayerModel } from "./Player"
 import { api } from "../services/api"
 import { AuthenticationApi } from "app/services/api/authApi"
-import { AuthStoreModel } from "./AuthStore"
 import { RootStore } from "./RootStore"
 
 /**
@@ -19,14 +18,15 @@ export const PlayerStoreModel = types
   .actions((self) => ({
     async fetchPlayers(refreshToken: string, accessToken: string){  
       const authenticationApi = new AuthenticationApi(api);
-      let response = await authenticationApi.getPlayers(refreshToken, accessToken);
+      const response = await authenticationApi.getPlayers(refreshToken, accessToken);
       if (response.kind === "ok") {
+        console.log(response.players)
         self.setProp("players", response.players)
       } else if(response.kind ==="unauthorized") {
         const authStore = getParent<RootStore>(self).authStore;
         authStore.refToken();
         console.log(`ref ${authStore.refreshToken} acc ${authStore.authToken}`)
-        let response = await authenticationApi.getPlayers(authStore.refreshToken, authStore.authToken);
+        const response = await authenticationApi.getPlayers(authStore.refreshToken, authStore.authToken);
         console.log(response);
       }else {
         console.log(response)
