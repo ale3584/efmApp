@@ -5,14 +5,15 @@ import { AppStackScreenProps } from "../navigators"
 import { Button, Screen, Text } from "../components"
 import { useStores } from "../models"
 import { FlashList } from "@shopify/flash-list"
-import { FlatList } from "native-base"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { Svg, Defs, LinearGradient, Rect, Stop } from "react-native-svg"
 
 interface HomeScreenProps extends AppStackScreenProps<"Home"> {}
 
 export const { width, height } = Dimensions.get("window")
 export const ITEM_HEIGHT = height * 0.18
 export const SPACING = 10
+export const FROM_COLOR = "#F8EB7D"
+export const TO_COLOR = "#3287D6"
 
 // @ts-ignore
 export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_props) {
@@ -47,12 +48,21 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
               }}
               style={{ marginBottom: SPACING, height: ITEM_HEIGHT }}
             >
+              <Svg height="100%" width="100%" style={StyleSheet.absoluteFillObject}>
+                <Defs>
+                  <LinearGradient id="grad" x1={"0%"} x2={"100%"} y1={"0%"} y2={"100%"}>
+                    <Stop offset="0" stopColor={FROM_COLOR} />
+                    <Stop offset="1" stopColor={TO_COLOR} />
+                  </LinearGradient>
+                </Defs>
+                <Rect rx={16} width="100%" height="100%" fill="url(#grad)" />
+              </Svg>
               <View style={{ flex: 1, padding: SPACING }}>
                 <View
                   style={[
                     StyleSheet.absoluteFillObject,
                     // eslint-disable-next-line react-native/no-inline-styles, react-native/no-color-literals
-                    { backgroundColor: "grey", borderRadius: 16, padding: SPACING },
+                    { borderRadius: 16, padding: SPACING },
                   ]}
                 >
                   <Text style={styles.name}>{item.name}</Text>

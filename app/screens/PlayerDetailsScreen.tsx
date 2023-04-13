@@ -4,8 +4,9 @@ import { Image, ScrollView, StyleSheet, View } from "react-native"
 import { AppStackScreenProps } from "../navigators"
 import { Screen, Text } from "app/components"
 import { AntDesign } from "@expo/vector-icons"
-import { ITEM_HEIGHT, SPACING, width, height } from "./HomeScreen"
+import { ITEM_HEIGHT, SPACING, width, height, TO_COLOR, FROM_COLOR } from "./HomeScreen"
 import * as Animatable from "react-native-animatable"
+import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg"
 
 interface PlayerDetailsScreenProps extends AppStackScreenProps<"PlayerDetails"> {}
 
@@ -33,12 +34,21 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
             navigation.goBack()
           }}
         />
+        <Svg height="100%" width="100%" style={StyleSheet.absoluteFillObject}>
+          <Defs>
+            <LinearGradient id="grad" x1={"0%"} x2={"100%"} y1={"0%"} y2={"100%"}>
+              <Stop offset="0" stopColor={FROM_COLOR} />
+              <Stop offset="1" stopColor={TO_COLOR} />
+            </LinearGradient>
+          </Defs>
+          <Rect rx={16} width="100%" height={TOP_HEADER_HEIGHT + 32} fill="url(#grad)" />
+        </Svg>
         <View
           style={[
             StyleSheet.absoluteFillObject,
             // eslint-disable-next-line react-native/no-inline-styles, react-native/no-color-literals
             {
-              backgroundColor: "grey",
+              // backgroundColor: "grey",
               borderRadius: 16,
               padding: SPACING,
               height: TOP_HEADER_HEIGHT + 32,
