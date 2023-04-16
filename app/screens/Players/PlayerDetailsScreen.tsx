@@ -1,12 +1,13 @@
 import React, { FC } from "react"
 import { observer } from "mobx-react-lite"
 import { Image, ScrollView, StyleSheet, View } from "react-native"
-import { AppStackScreenProps } from "../navigators"
+import { AppStackScreenProps } from "../../navigators"
 import { Screen, Text } from "app/components"
 import { AntDesign } from "@expo/vector-icons"
-import { ITEM_HEIGHT, SPACING, width, height, TO_COLOR, FROM_COLOR } from "./HomeScreen"
+import { ITEM_HEIGHT, SPACING, width, height, TO_COLOR, FROM_COLOR } from "../HomeScreen"
 import * as Animatable from "react-native-animatable"
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 interface PlayerDetailsScreenProps extends AppStackScreenProps<"PlayerDetails"> {}
 
@@ -17,7 +18,7 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
   function PlayerDetailsScreen({ navigation, route }) {
     const { item } = route.params
     return (
-      <View style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
         <AntDesign
           name="arrowleft"
           size={28}
@@ -115,7 +116,7 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
             </ScrollView>
           </View>
         </View>
-      </View>
+      </SafeAreaView>
     )
   },
 )
