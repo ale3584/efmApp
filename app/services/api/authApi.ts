@@ -114,12 +114,12 @@ export class AuthenticationApi {
     return refreshRes
   }
 
-  async getPlayers(refreshToken: string, accessToken: string): Promise<{ kind: "ok"; players: PlayerSnapshotIn[] } | GeneralApiProblem> {
+  async getPlayers(refreshToken: string, accessToken: string, curPage: number | 0 ): Promise<{ kind: "ok"; players: PlayerSnapshotIn[] } | GeneralApiProblem> {
 
     this.api.setAuthToken(accessToken);
     this.api.setRefreshToken(refreshToken);
     const response: ApiResponse<ApiPlayersResponse> = await this.api.apisauce.get(
-      "/players",
+      "/players",{page: curPage},
     )
 
     // the typical ways to die when calling an api
@@ -145,18 +145,4 @@ export class AuthenticationApi {
       return { kind: "bad-data" }
     }
   }
-
-  async checkToken(refreshToken: string, accessToken: string): Promise<boolean> {
-
-    const decodedToken = jwtDecode(accessToken);
-
-    const expirationTime = decodedToken.exp;
-
-    if (expirationTime < new Date().getTime() / 1000) {
-      this.refreshToken(refreshToken);
-    } else {
-      return true;
-    }     
-  }
-
 }

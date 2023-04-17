@@ -2,12 +2,12 @@ import React, { FC } from "react"
 import { observer } from "mobx-react-lite"
 import { Image, ScrollView, StyleSheet, View } from "react-native"
 import { AppStackScreenProps } from "../../navigators"
-import { Screen, Text } from "app/components"
 import { AntDesign } from "@expo/vector-icons"
 import { ITEM_HEIGHT, SPACING, width, height, TO_COLOR, FROM_COLOR } from "../HomeScreen"
 import * as Animatable from "react-native-animatable"
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg"
 import { SafeAreaView } from "react-native-safe-area-context"
+import { Text } from "native-base"
 
 interface PlayerDetailsScreenProps extends AppStackScreenProps<"PlayerDetails"> {}
 
@@ -63,7 +63,13 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
           />
           <View style={styles.bg}>
             <ScrollView style={{ flex: 1 }}>
-              <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+              <View
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-evenly",
+                }}
+              >
                 <Animatable.View
                   animation="bounceIn"
                   delay={1 + 1 * 100}

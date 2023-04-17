@@ -1,6 +1,6 @@
 import React, { FC } from "react"
 import { observer } from "mobx-react-lite"
-import { Button, Dimensions, View, SafeAreaView } from "react-native"
+import { Dimensions, View, SafeAreaView } from "react-native"
 import { AppStackScreenProps } from "../navigators"
 import { useStores } from "../models"
 import {
@@ -9,7 +9,7 @@ import {
   createDrawerNavigator,
 } from "@react-navigation/drawer"
 import { PlayerScreen } from "./Players/PlayerScreen"
-import { Button as BaseButton } from "native-base"
+import { Button } from "app/components"
 
 interface HomeScreenProps extends AppStackScreenProps<"Home"> {}
 
@@ -42,9 +42,9 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
       drawerContent={(props) => {
         return (
           <DrawerContentScrollView {...props}>
-            <SafeAreaView forceInset={{ top: "always", horizontal: "never" }}>
+            <SafeAreaView>
               <DrawerItemList {...props} />
-              <BaseButton onPress={() => logout}>Logout</BaseButton>
+              <Button onPress={() => logout()}>Logout</Button>
             </SafeAreaView>
           </DrawerContentScrollView>
         )

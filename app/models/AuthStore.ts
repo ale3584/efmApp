@@ -103,6 +103,7 @@ export const AuthStoreModel = types
       const authenticationApi = new AuthenticationApi(api);
       const result: LogoutResult = yield authenticationApi.logout(self.refreshToken, self.authToken);
 
+      console.log(result)
       if (result.kind === "ok") {
         self.setStatus("done");
         self.setAuthenticated(false);

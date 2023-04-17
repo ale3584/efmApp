@@ -8,10 +8,10 @@ import { PlayerStoreModel } from "./PlayerStore"
  * A RootStore model.
  */
 export const RootStoreModel = types.model("RootStore").props({
-  authenticationStore: types.optional(AuthenticationStoreModel, {}), // @demo remove-current-line
-  episodeStore: types.optional(EpisodeStoreModel, {}), // @demo remove-current-line
+  authenticationStore: types.optional(AuthenticationStoreModel, {}),
+  episodeStore: types.optional(EpisodeStoreModel, {}),
   authStore: types.optional(AuthStoreModel, {}),
-  playerStore: types.optional(PlayerStoreModel, {}),
+  playerStore: types.optional(PlayerStoreModel, {players:[], isLoading: false, error: null}),
 })
 
 /**
