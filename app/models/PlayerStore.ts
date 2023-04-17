@@ -16,21 +16,20 @@ export const PlayerStoreModel = types
   .actions(withSetPropAction)
   .views((self) => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
   .actions((self) => ({
-    async fetchPlayers(refreshToken: string, accessToken: string){  
-      const authenticationApi = new AuthenticationApi(api);
-      const response = await authenticationApi.getPlayers(refreshToken, accessToken);
-      if (response.kind === "ok") {
-        console.log(response.players)
-        self.setProp("players", response.players)
-      } else if(response.kind ==="unauthorized") {
-        const authStore = getParent<RootStore>(self).authStore;
-        authStore.refToken();
-        console.log(`ref ${authStore.refreshToken} acc ${authStore.authToken}`)
-        const response = await authenticationApi.getPlayers(authStore.refreshToken, authStore.authToken);
-        console.log(response);
-      }else {
-        console.log(response)
-        console.tron.error(`Error fetching players: ${JSON.stringify(response)}`, [])
+    async fetchPlayers(refreshToken: string, accessToken: string){
+      const authStore = getParent<RootStore>(self).authStore;  
+      if(authStore.checkToken()){
+        const authenticationApi = new AuthenticationApi(api);
+        const response = await authenticationApi.getPlayers(refreshToken, accessToken);
+        if (response.kind === "ok") {
+          console.log(response.players)
+          self.setProp("players", response.players)
+        }else {
+          console.log(response)
+          console.tron.error(`Error fetching players: ${JSON.stringify(response)}`, [])
+        }
+      }else{
+        authStore.logout();
       }
     },
   })) // eslint-disable-line @typescript-eslint/no-unused-vars

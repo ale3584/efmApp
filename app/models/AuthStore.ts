@@ -3,7 +3,13 @@ import { withSetPropAction } from "./helpers/withSetPropAction"
 import { withStatus } from "../extensions/with-status"
 import { AuthenticationApi } from "../services/api/authApi"
 import { LoginFullResult, LogoutResult, RegisterResult, api, refreshTokenResult } from "../services/api"
+import jwtDecode from "jwt-decode"
 
+type DecodedToken = {
+    sub: string,
+    iat: number,
+    exp: number,
+}
 /**
  * Model description here for TypeScript hints.
  */
@@ -128,6 +134,29 @@ export const AuthStoreModel = types
         self.refreshToken = "";
         self.authEmail = "";
         __DEV__ && console.tron.log(result.kind);
+      }
+    }),
+    
+  })).actions(self=> ({
+    checkToken: flow(function* () {
+      self.setStatus("pending");
+
+      const decodedToken: DecodedToken = jwtDecode(self.authToken);
+
+      const expirationTime = decodedToken.exp;
+  
+      if (expirationTime < new Date().getTime() / 1000) {
+        self.refToken();
+        const decodedToken: DecodedToken = jwtDecode(self.authToken);
+
+        const expirationTime = decodedToken.exp;
+        if (expirationTime < new Date().getTime() / 1000) {
+          return false;
+        }else{
+          return true;
+        }
+      } else {
+        return true;
       }
     }),
   }))

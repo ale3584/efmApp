@@ -3,7 +3,7 @@ import { Api } from "./api";
 import { GeneralApiProblem, getGeneralApiProblem } from "./apiProblem";
 import { ApiPlayersResponse, LoginFullResult, LogoutResult, RegisterResult, refreshTokenResult } from "./api.types";
 import { PlayerSnapshotIn } from "../../models/Player";
-import { useStores } from "app/models";
+import jwtDecode from 'jwt-decode';
 
 export class AuthenticationApi {
   private api: Api;
@@ -145,4 +145,18 @@ export class AuthenticationApi {
       return { kind: "bad-data" }
     }
   }
+
+  async checkToken(refreshToken: string, accessToken: string): Promise<boolean> {
+
+    const decodedToken = jwtDecode(accessToken);
+
+    const expirationTime = decodedToken.exp;
+
+    if (expirationTime < new Date().getTime() / 1000) {
+      this.refreshToken(refreshToken);
+    } else {
+      return true;
+    }     
+  }
+
 }
