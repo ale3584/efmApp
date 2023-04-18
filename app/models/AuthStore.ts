@@ -141,6 +141,9 @@ export const AuthStoreModel = types
   })).actions(self=> ({
     checkToken: flow(function* () {
       self.setStatus("pending");
+      if(self.authToken ===""){
+        return false;
+      } 
 
       const decodedToken: DecodedToken = jwtDecode(self.authToken);
 
@@ -160,6 +163,32 @@ export const AuthStoreModel = types
         return true;
       }
     }),
+  }))
+  .views((self) => ({
+    get isTokenValid() {
+      self.setStatus("pending");
+      if(self.authToken ===""){
+        return false;
+      } 
+
+      const decodedToken: DecodedToken = jwtDecode(self.authToken);
+
+      const expirationTime = decodedToken.exp;
+  
+      if (expirationTime < new Date().getTime() / 1000) {
+        self.refToken();
+        const decodedToken: DecodedToken = jwtDecode(self.authToken);
+
+        const expirationTime = decodedToken.exp;
+        if (expirationTime < new Date().getTime() / 1000) {
+          return false;
+        }else{
+          return true;
+        }
+      } else {
+        return true;
+      }
+    },
   }))
 
 export interface AuthStore extends Instance<typeof AuthStoreModel> {}

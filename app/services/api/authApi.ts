@@ -3,7 +3,6 @@ import { Api } from "./api";
 import { GeneralApiProblem, getGeneralApiProblem } from "./apiProblem";
 import { ApiPlayersResponse, LoginFullResult, LogoutResult, RegisterResult, refreshTokenResult } from "./api.types";
 import { PlayerSnapshotIn } from "../../models/Player";
-import jwtDecode from 'jwt-decode';
 
 export class AuthenticationApi {
   private api: Api;
@@ -114,7 +113,7 @@ export class AuthenticationApi {
     return refreshRes
   }
 
-  async getPlayers(refreshToken: string, accessToken: string, curPage: number | 0 ): Promise<{ kind: "ok"; players: PlayerSnapshotIn[] } | GeneralApiProblem> {
+  async getPlayers(refreshToken: string, accessToken: string, curPage: number ): Promise<{ kind: "ok"; players: PlayerSnapshotIn[] } | GeneralApiProblem> {
 
     this.api.setAuthToken(accessToken);
     this.api.setRefreshToken(refreshToken);

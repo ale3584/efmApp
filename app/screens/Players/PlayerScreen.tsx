@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, { FC, useEffect, useState } from "react"
 import { observer } from "mobx-react-lite"
 import {
@@ -27,23 +28,29 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
   function PlayerScreen(_props) {
     const { navigation } = _props
     const [data, setData] = useState([])
+    const [page, setPage] = useState(0)
+    const [isEndReached, setIsEndReached] = useState(true)
     const {
       playerStore,
-      playerStore: { isLoading, error },
+      playerStore: { isLoading, error, players },
     } = useStores()
 
-    const { authStore } = useStores()
+    const {
+      authStore: { refreshToken, authToken, logout, isTokenValid },
+    } = useStores()
 
     const onfetchPlayers = async () => {
-      if (authStore.checkToken()) {
-        playerStore.appendPlayers(
-          authStore.refreshToken,
-          authStore.authToken,
-          playerStore.currentPage,
-        )
-        setData([...data, ...playerStore.players])
+      if (isLoading) {
+        return
+      }
+
+      if (isTokenValid) {
+        playerStore.appendPlayers(refreshToken, authToken, page)
+        setIsEndReached(false)
+        setData([data, ...players])
+        setPage(page + 1)
       } else {
-        authStore.logout()
+        logout()
       }
     }
 
@@ -52,14 +59,9 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
     }, [])
 
     const handleEndReached = () => {
-      if (!playerStore.isLoading) {
-        playerStore.setCurrentPage(playerStore.currentPage + 1)
-        playerStore.appendPlayers(
-          authStore.refreshToken,
-          authStore.authToken,
-          playerStore.currentPage,
-        )
-        setData([...data, ...playerStore.players])
+      if (!isEndReached) {
+        setIsEndReached(true)
+        onfetchPlayers()
       }
     }
     return (
@@ -69,9 +71,11 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
         ) : error ? (
           <Text>{error}</Text>
         ) : (
+          // eslint-disable-next-line react-native/no-inline-styles
           <View style={{ flex: 1 }}>
             <FlashList
               onEndReached={() => handleEndReached()}
+              onEndReachedThreshold={0.85}
               data={data}
               keyExtractor={(item) => `${item.id}`}
               contentContainerStyle={{ padding: SPACING }}
@@ -112,7 +116,7 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
                   </View>
                 </TouchableOpacity>
               )}
-              estimatedItemSize={4}
+              estimatedItemSize={10}
             />
             {/* <View style={styles.bg} /> */}
           </View>

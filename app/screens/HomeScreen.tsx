@@ -9,7 +9,7 @@ import {
   createDrawerNavigator,
 } from "@react-navigation/drawer"
 import { PlayerScreen } from "./Players/PlayerScreen"
-import { Button } from "app/components"
+import { Button, Text } from "app/components"
 
 interface HomeScreenProps extends AppStackScreenProps<"Home"> {}
 
@@ -27,18 +27,18 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
     authStore: { logout },
   } = useStores()
 
-  function HomeScreen({ navigation }) {
+  function HomeScreen() {
     return (
       // eslint-disable-next-line react-native/no-inline-styles
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Button onPress={() => navigation.goBack()} title="Go back home" />
+        <Text>Home</Text>
       </View>
     )
   }
 
   return (
     <Drawer.Navigator
-      initialRouteName="Home"
+      initialRouteName="DHome"
       drawerContent={(props) => {
         return (
           <DrawerContentScrollView {...props}>
@@ -50,7 +50,7 @@ export const HomeScreen: FC<HomeScreenProps> = observer(function HomeScreen(_pro
         )
       }}
     >
-      <Drawer.Screen name="Home" component={HomeScreen} />
+      <Drawer.Screen name="DHome" component={HomeScreen} />
       <Drawer.Screen name="DB" component={PlayerScreen} />
     </Drawer.Navigator>
   )
