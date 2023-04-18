@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from "react"
+import React, { FC, useEffect, useState } from "react"
 import { observer } from "mobx-react-lite"
 import {
   ActivityIndicator,
@@ -15,7 +15,6 @@ import { FlashList } from "@shopify/flash-list"
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg"
 import { useStores } from "app/models"
 import * as Animatable from "react-native-animatable"
-import { event } from "react-native-reanimated"
 
 const { height } = Dimensions.get("window")
 const ITEM_HEIGHT = height * 0.18
@@ -27,17 +26,22 @@ const TO_COLOR = "#3287D6"
 export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> = observer(
   function PlayerScreen(_props) {
     const { navigation } = _props
+    const [data, setData] = useState([])
     const {
       playerStore,
-      playerStore: { isLoading, error, appendPlayers },
+      playerStore: { isLoading, error },
     } = useStores()
 
     const { authStore } = useStores()
 
     const onfetchPlayers = async () => {
-      if (authStore.checkToken() && !playerStore.isLoading) {
-        playerStore.setCurrentPage(0)
-        await playerStore.fetchPlayers(authStore.refreshToken, authStore.authToken)
+      if (authStore.checkToken()) {
+        playerStore.appendPlayers(
+          authStore.refreshToken,
+          authStore.authToken,
+          playerStore.currentPage,
+        )
+        setData([...data, ...playerStore.players])
       } else {
         authStore.logout()
       }
@@ -50,7 +54,12 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
     const handleEndReached = () => {
       if (!playerStore.isLoading) {
         playerStore.setCurrentPage(playerStore.currentPage + 1)
-        appendPlayers(authStore.refreshToken, authStore.authToken, playerStore.currentPage)
+        playerStore.appendPlayers(
+          authStore.refreshToken,
+          authStore.authToken,
+          playerStore.currentPage,
+        )
+        setData([...data, ...playerStore.players])
       }
     }
     return (
@@ -62,8 +71,8 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
         ) : (
           <View style={{ flex: 1 }}>
             <FlashList
-              // onEndReached={handleEndReached}
-              data={playerStore.players}
+              onEndReached={() => handleEndReached()}
+              data={data}
               keyExtractor={(item) => `${item.id}`}
               contentContainerStyle={{ padding: SPACING }}
               renderItem={({ item }) => (
