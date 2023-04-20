@@ -72,13 +72,13 @@ export const PlayerStoreModel = types
         authStore.logout();
       }
     },
-    async appendPlayers(refreshToken: string, accessToken: string, page: number | 0){
+    async appendPlayers(page: number){
       self.setIsLoading(true);
       const authStore = getParent<RootStore>(self).authStore; 
       if(authStore.isTokenValid){
         const authenticationApi = new AuthenticationApi(api);
         try{
-          const response = await authenticationApi.getPlayers(refreshToken, accessToken, page);
+          const response = await authenticationApi.getPlayers(authStore.refreshToken, authStore.authToken, page);
           if (response.kind === "ok") {
             self.setIsLoading(false);
             self.setIsEndReached(false)
