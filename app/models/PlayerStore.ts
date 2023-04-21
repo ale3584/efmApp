@@ -38,7 +38,14 @@ export const PlayerStoreModel = types
       self.isEndReached = value
     }
   }))
-  .views((self) => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
+  .views((self) => ({
+    get IsLoading() {
+      return self.isLoading
+    },
+    get IsEndReached(){
+      return self.isEndReached
+    },
+  })) // eslint-disable-line @typescript-eslint/no-unused-vars
   .actions((self) => ({
     async fetchPlayers(refreshToken: string, accessToken: string){
       const authStore = getParent<RootStore>(self).authStore; 

@@ -6,6 +6,6 @@
  * https://reactnative.dev/docs/security#storing-sensitive-info
  */
 export default {
-  // API_URL: "http://192.168.88.36:8080/api/",
-  API_URL: "http://superleague.pp.ua:8080/api/",
+  API_URL: "http://192.168.88.36:8080/api/",
+  // API_URL: "http://192.168.89.255:8080/api/",
 }

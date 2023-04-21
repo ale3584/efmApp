@@ -28,26 +28,26 @@ const TO_COLOR = "#3287D6"
 export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> = observer(
   function PlayerScreen(_props) {
     const { navigation } = _props
-    const [isEndReached, setIsEndReached] = useState(true)
-    const [refreshing, setRefreshing] = React.useState(false)
+    const [refreshing, setRefreshing] = useState(false)
+    const [page, setPage] = useState(0)
     const {
       playerStore,
-      playerStore: { isLoading, error, currentPage, setCurrentPage },
+      playerStore: { IsEndReached, IsLoading, error },
     } = useStores()
 
     const {
       authStore: { logout, isTokenValid },
     } = useStores()
 
-    const onfetchPlayers = async () => {
-      if (isLoading) {
+    const onfetchPlayers = () => {
+      if (IsLoading) {
         return
       }
 
       if (isTokenValid) {
-        playerStore.appendPlayers(currentPage)
-        setIsEndReached(false)
-        setCurrentPage(currentPage + 1)
+        playerStore.appendPlayers(page)
+        playerStore.setIsEndReached(false)
+        setPage(page + 1)
       } else {
         logout()
       }
@@ -57,11 +57,11 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
       onfetchPlayers()
     }, [])
 
-    const handleEndReached = () => {
-      if (!isEndReached) {
-        setIsEndReached(true)
+    const handleEndReached = async () => {
+      if (!IsEndReached) {
+        await playerStore.setIsEndReached(true)
         setRefreshing(true)
-        onfetchPlayers()
+        await onfetchPlayers()
         setRefreshing(false)
       }
     }
@@ -114,8 +114,8 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
     )
 
     return (
-      <Screen style={$root} preset="scroll">
-        {isLoading ? (
+      <View style={$root}>
+        {IsLoading ? (
           <ActivityIndicator size={"large"} />
         ) : error ? (
           <Text>{error}</Text>
@@ -123,21 +123,21 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
           // eslint-disable-next-line react-native/no-inline-styles
           <View style={{ flex: 1 }}>
             <FlashList
-              onEndReached={() => handleEndReached()}
+              onEndReached={!IsEndReached && handleEndReached}
               data={playerStore.players}
-              keyExtractor={(item) => `${item.id}`}
+              keyExtractor={(item) => item.id.toString()}
               contentContainerStyle={{ padding: SPACING }}
               renderItem={renderItem}
               ListEmptyComponent={renderEmpty}
-              // ListFooterComponent={renderFooter}
-              estimatedItemSize={100}
-              // onEndReachedThreshold={0.2}
+              ListFooterComponent={renderEmpty}
+              estimatedItemSize={10}
+              onEndReachedThreshold={0.2}
               refreshing={refreshing}
             />
             {/* <View style={styles.bg} /> */}
           </View>
         )}
-      </Screen>
+      </View>
     )
   },
 )
