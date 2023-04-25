@@ -5,6 +5,8 @@ import {
   ActivityIndicator,
   Button,
   Dimensions,
+  FlatList,
+  Image,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -13,7 +15,6 @@ import {
 import { StackScreenProps } from "@react-navigation/stack"
 import { AppStackScreenProps } from "app/navigators"
 import { Screen, Text } from "app/components"
-import { FlashList } from "@shopify/flash-list"
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg"
 import { useStores } from "app/models"
 import * as Animatable from "react-native-animatable"
@@ -29,27 +30,29 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
   function PlayerScreen(_props) {
     const { navigation } = _props
     const [refreshing, setRefreshing] = useState(false)
+    // const [data, setData] = useState([])
     const [page, setPage] = useState(0)
     const {
       playerStore,
-      playerStore: { IsEndReached, IsLoading, error },
+      playerStore: { IsEndReached, IsLoading },
     } = useStores()
 
     const {
       authStore: { logout, isTokenValid },
     } = useStores()
 
-    const onfetchPlayers = () => {
+    const onfetchPlayers = async () => {
       if (IsLoading) {
         return
       }
 
       if (isTokenValid) {
-        playerStore.appendPlayers(page)
-        playerStore.setIsEndReached(false)
-        setPage(page + 1)
+        await playerStore.fetchPlayers()
+        await playerStore.setIsEndReached(false)
+        // await setData([...data, ...playerStore.players.slice()])
+        await setPage(page + 1)
       } else {
-        logout()
+        await logout()
       }
     }
 
@@ -60,9 +63,12 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
     const handleEndReached = async () => {
       if (!IsEndReached) {
         await playerStore.setIsEndReached(true)
-        setRefreshing(true)
-        await onfetchPlayers()
-        setRefreshing(false)
+        await setRefreshing(true)
+        await playerStore.appendPlayers(page)
+        await playerStore.setIsEndReached(false)
+        // await setData([...data, ...playerStore.players.slice()])
+        await setPage(page + 1)
+        await setRefreshing(false)
       }
     }
 
@@ -74,6 +80,13 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
         <Button onPress={() => onfetchPlayers()} title="Refresh" />
       </View>
     )
+
+    const renderFooter = (IsLoading) =>
+      IsLoading ? (
+        <View>
+          <ActivityIndicator size={"large"} />
+        </View>
+      ) : null
 
     const renderItem = ({ item }) => (
       <TouchableOpacity
@@ -101,8 +114,8 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
           >
             <Text style={styles.name}>{item.name}</Text>
             <Text>{item.overall}</Text>
-            <Animatable.Image
-              animation="fadeIn"
+            <Image
+              // animation="fadeIn"
               style={styles.image}
               source={{
                 uri: "https://api.efootballdb.com/assets/2022/players/7511_.png",
@@ -115,28 +128,20 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
 
     return (
       <View style={$root}>
-        {IsLoading ? (
-          <ActivityIndicator size={"large"} />
-        ) : error ? (
-          <Text>{error}</Text>
-        ) : (
-          // eslint-disable-next-line react-native/no-inline-styles
-          <View style={{ flex: 1 }}>
-            <FlashList
-              onEndReached={!IsEndReached && handleEndReached}
-              data={playerStore.players}
-              keyExtractor={(item) => item.id.toString()}
-              contentContainerStyle={{ padding: SPACING }}
-              renderItem={renderItem}
-              ListEmptyComponent={renderEmpty}
-              ListFooterComponent={renderEmpty}
-              estimatedItemSize={10}
-              onEndReachedThreshold={0.2}
-              refreshing={refreshing}
-            />
-            {/* <View style={styles.bg} /> */}
-          </View>
-        )}
+        <View style={{ flex: 1 }}>
+          <FlatList
+            onEndReached={!IsEndReached && handleEndReached}
+            data={playerStore.players.slice()}
+            keyExtractor={(item, index) => index.toString()}
+            contentContainerStyle={{ padding: SPACING }}
+            renderItem={renderItem}
+            ListEmptyComponent={renderEmpty}
+            ListFooterComponent={renderFooter(IsLoading)}
+            onEndReachedThreshold={0}
+            refreshing={refreshing}
+          />
+          {/* <View style={styles.bg} /> */}
+        </View>
       </View>
     )
   },

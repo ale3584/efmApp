@@ -11,7 +11,7 @@ import { RootStore } from "./RootStore"
 export const PlayerStoreModel = types
   .model("PlayerStore")
   .props({
-    players: types.array(PlayerModel),
+    players: types.optional(types.array(PlayerModel),[]),
     isLoading: types.boolean,
     error: types.maybeNull(types.string),
     currentPage: types.optional(types.number, 0),
@@ -26,7 +26,7 @@ export const PlayerStoreModel = types
       self.isLoading = value
     },
     setPLayers(players){
-      self.players = players;
+      self.players = players
     },
     setAppendPlayers(players){
       self.players.push(...players)
@@ -47,36 +47,36 @@ export const PlayerStoreModel = types
     },
   })) // eslint-disable-line @typescript-eslint/no-unused-vars
   .actions((self) => ({
-    async fetchPlayers(refreshToken: string, accessToken: string){
+    async fetchPlayers(){
       const authStore = getParent<RootStore>(self).authStore; 
       self.setIsLoading(true);
       if(authStore.isTokenValid){
         const authenticationApi = new AuthenticationApi(api);
         try{
-          const response = await authenticationApi.getPlayers(refreshToken, accessToken,0);
+          const response = await authenticationApi.getPlayers(authStore.refreshToken, authStore.authToken, 0);
           if (response.kind === "ok") {
             console.log(response.players)
-            self.setIsLoading(false);
-            self.setIsEndReached(false)
-            self.setError(null);
-            self.setPLayers(response.players);
+            await self.setIsLoading(false);
+            await self.setIsEndReached(false)
+            await self.setError(null);
+            await self.setPLayers(response.players);
           }else {
             console.log(response)
-            self.setIsLoading(false);
-            self.setIsEndReached(false)
-            self.setError(null);
+            await self.setIsLoading(false);
+            await self.setIsEndReached(false)
+            await self.setError(null);
             console.tron.error(`Error fetching players: ${JSON.stringify(response)}`, [])
           }
         }catch(error){
-          self.setIsLoading(false);
-          self.setIsEndReached(false)
-          self.setError(error.message);
+          await self.setIsLoading(false);
+          await self.setIsEndReached(false)
+          await self.setError(error.message);
         }
       }else{
-        self.setIsLoading(false);
-        self.setIsEndReached(false)
-        self.setError(null);
-        authStore.logout();
+        await self.setIsLoading(false);
+        await self.setIsEndReached(false)
+        await self.setError(null);
+        await authStore.logout();
       }
     },
     async appendPlayers(page: number){
@@ -87,30 +87,30 @@ export const PlayerStoreModel = types
         try{
           const response = await authenticationApi.getPlayers(authStore.refreshToken, authStore.authToken, page);
           if (response.kind === "ok") {
-            self.setIsLoading(false);
-            self.setIsEndReached(false)
-            self.setError(null);
-            self.setAppendPlayers(response.players);
+            await self.setIsLoading(false);
+            await self.setIsEndReached(false)
+            await self.setError(null);
+            await self.setAppendPlayers(response.players);
           }else {
             console.log(response)
-            self.setIsLoading(false);
-            self.setIsEndReached(false)
-            self.setPLayers([])
-            self.setError(null);
+            await self.setIsLoading(false);
+            await self.setIsEndReached(false)
+            await self.setPLayers([])
+            await self.setError(null);
             console.tron.error(`Error fetching players: ${JSON.stringify(response)}`, [])
           }
         }catch(error){
-          self.setIsLoading(false);
-          self.setIsEndReached(false)
-          self.setPLayers([])
-          self.setError(error.message);
+          await self.setIsLoading(false);
+          await self.setIsEndReached(false)
+          await self.setPLayers([])
+          await self.setError(error.message);
         }
       }else{
-        self.setIsLoading(false);
-        self.setIsEndReached(false)
-        self.setPLayers({PlayerModel:[]})
-        self.setError(null);
-        authStore.logout();
+        await self.setIsLoading(false);
+        await self.setIsEndReached(false)
+        await self.setPLayers({PlayerModel:[]})
+        await self.setError(null);
+        await authStore.logout();
       }
     },
   })) // eslint-disable-line @typescript-eslint/no-unused-vars
