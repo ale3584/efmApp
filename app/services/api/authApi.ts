@@ -1,102 +1,141 @@
-import { ApiResponse } from "apisauce";
-import { Api } from "./api";
-import { GeneralApiProblem, getGeneralApiProblem } from "./apiProblem";
-import { ApiPlayersResponse, LoginFullResult, LogoutResult, RegisterResult, refreshTokenResult } from "./api.types";
-import { PlayerSnapshotIn } from "../../models/Player";
+import { ApiResponse } from "apisauce"
+import { Api } from "./api"
+import { GeneralApiProblem, getGeneralApiProblem } from "./apiProblem"
+import {
+  ApiPlayersResponse,
+  LoginFullResult,
+  LogoutResult,
+  RegisterResult,
+  refreshTokenResult,
+} from "./api.types"
+import { PlayerSnapshotIn } from "../../models/Player"
+import { useStores } from "app/models"
 
 export class AuthenticationApi {
-  private api: Api;
+  private api: Api
+
   constructor(api: Api) {
-    this.api = api;
+    this.api = api
+    const { authStore } = useStores()
+
+    this.api.apisauce.addAsyncRequestTransform((request) => async () => {
+      await newFunction()
+
+      function newFunction() {
+        if (authStore.authToken) {
+          request.headers.Authorization = "Bearer " + authStore.authToken
+        }
+        if (authStore.refreshToken) {
+          request.headers.refreshToken = authStore.refreshToken
+        }
+      }
+    })
+
+    this.api.apisauce.addAsyncResponseTransform(async (response) => {
+      if (response.data.code === 401 || response.data.code === 403) {
+        const refToken = await authStore.refreshToken
+        const response: ApiResponse<any> = await this.api.apisauce.get("/auth/refreshtoken", {
+          refreshToken: refToken,
+        })
+        const res = response.data
+        if (!res.success) {
+          // if refreshToken invalid, logout
+          await authStore.logout()
+        } else {
+          await authStore.setAuthToken(response.data.accessToken)
+          await authStore.setRefreshToken(response.data.refreshToken)
+          // retry
+          const data = await this.api.apisauce.any(response.config)
+          // replace data
+          response.data = data.data
+        }
+      }
+    })
   }
 
   async login(username: string, password: string): Promise<LoginFullResult> {
     try {
-      const  loginRes: LoginFullResult = {
+      const loginRes: LoginFullResult = {
         refreshToken: "",
-        accessToken:"",
+        accessToken: "",
         roles: [],
-        kind: "ok"
-      };
-      const response: ApiResponse<any> = await this.api.apisauce.post(
-        "/auth/signin",
-        { username, password }
-      );
+        kind: "ok",
+      }
+      const response: ApiResponse<any> = await this.api.apisauce.post("/auth/signin", {
+        username,
+        password,
+      })
 
       if (!response.ok) {
-        const problem = getGeneralApiProblem(response);
-        loginRes.kind = problem;
-        if (problem) return loginRes;
+        const problem = getGeneralApiProblem(response)
+        loginRes.kind = problem
+        if (problem) return loginRes
       }
-      
-      loginRes.accessToken = response.data.accessToken;
-      loginRes.refreshToken = response.data.refreshToken;
-      loginRes.roles = response.data.roles;
-      loginRes.kind = "ok";
 
-      return loginRes;
+      loginRes.accessToken = response.data.accessToken
+      loginRes.refreshToken = response.data.refreshToken
+      loginRes.roles = response.data.roles
+      loginRes.kind = "ok"
+
+      return loginRes
     } catch (e) {
-      __DEV__ && console.tron.log(e.message);
+      __DEV__ && console.tron.log(e.message)
       return {
         refreshToken: "",
-        accessToken:"",
-        kind: {kind:"bad-data"},
-        roles: []
+        accessToken: "",
+        kind: { kind: "bad-data" },
+        roles: [],
       }
     }
   }
 
-  async signup(username: string, email:string,  password: string): Promise<RegisterResult> {
+  async signup(username: string, email: string, password: string): Promise<RegisterResult> {
     try {
-      const response: ApiResponse<any> = await this.api.apisauce.post(
-        "/auth/signup",
-        { username, email, password }
-      );
+      const response: ApiResponse<any> = await this.api.apisauce.post("/auth/signup", {
+        username,
+        email,
+        password,
+      })
 
       if (!response.ok) {
-        const problem = getGeneralApiProblem(response);
-        if (problem) return problem;
+        const problem = getGeneralApiProblem(response)
+        if (problem) return problem
       }
-      
-     
-      return {kind: "ok"}
+
+      return { kind: "ok" }
     } catch (e) {
-      __DEV__ && console.tron.log(e.message);
-      return {kind:"bad-data"}
+      __DEV__ && console.tron.log(e.message)
+      return { kind: "bad-data" }
     }
   }
 
   async logout(refreshToken: string, accessToken: string): Promise<LogoutResult> {
     try {
-      this.api.setAuthToken(accessToken);
-      this.api.setRefreshToken(refreshToken);
-      const response: ApiResponse<any> = await this.api.apisauce.post(
-        "/auth/signout"
-      );
+      this.api.setAuthToken(accessToken)
+      this.api.setRefreshToken(refreshToken)
+      const response: ApiResponse<any> = await this.api.apisauce.post("/auth/signout")
 
       if (!response.ok) {
-        const problem = getGeneralApiProblem(response);
-        if (problem) return problem;
+        const problem = getGeneralApiProblem(response)
+        if (problem) return problem
       }
 
-      return { kind: "ok" };
+      return { kind: "ok" }
     } catch (e) {
-      __DEV__ && console.tron.log(e.message);
-      return { kind: "bad-data" };
+      __DEV__ && console.tron.log(e.message)
+      return { kind: "bad-data" }
     }
   }
 
-  async refreshToken(refToken:string): Promise<refreshTokenResult> {
-    const  refreshRes: refreshTokenResult = {
+  async refreshToken(refToken: string): Promise<refreshTokenResult> {
+    const refreshRes: refreshTokenResult = {
       refreshToken: "",
-      accessToken:"",
+      accessToken: "",
       kind: "ok",
-    };
+    }
 
-    this.api.setAuthToken(refToken);
-    const response: ApiResponse<any> = await this.api.apisauce.post(
-      "/auth/refreshtoken"
-    );
+    this.api.setAuthToken(refToken)
+    const response: ApiResponse<any> = await this.api.apisauce.post("/auth/refreshtoken")
 
     if (!response.ok) {
       const problem = getGeneralApiProblem(response)
@@ -106,26 +145,29 @@ export class AuthenticationApi {
       }
     }
 
-    refreshRes.accessToken = response.data.accessToken;
-    refreshRes.refreshToken = response.data.refreshToken;
-    refreshRes.kind = "ok";
+    refreshRes.accessToken = response.data.accessToken
+    refreshRes.refreshToken = response.data.refreshToken
+    refreshRes.kind = "ok"
 
     return refreshRes
   }
 
-  async getPlayers(refreshToken: string, accessToken: string, curPage: number ): Promise<{ kind: "ok"; players: PlayerSnapshotIn[] } | GeneralApiProblem> {
-
-    this.api.setAuthToken(accessToken);
-    this.api.setRefreshToken(refreshToken);
-    const response: ApiResponse<ApiPlayersResponse> = await this.api.apisauce.get(
-      "/players",{page: curPage},
-    )
+  async getPlayers(
+    refreshToken: string,
+    accessToken: string,
+    curPage: number,
+  ): Promise<{ kind: "ok"; players: PlayerSnapshotIn[] } | GeneralApiProblem> {
+    this.api.setAuthToken(accessToken)
+    this.api.setRefreshToken(refreshToken)
+    const response: ApiResponse<ApiPlayersResponse> = await this.api.apisauce.get("/players", {
+      page: curPage,
+    })
 
     // the typical ways to die when calling an api
     if (!response.ok) {
       const problem = getGeneralApiProblem(response)
       if (problem) return problem
-    }     
+    }
 
     // transform the data into the format we are expecting
     try {

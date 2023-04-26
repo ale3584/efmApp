@@ -18,6 +18,7 @@ import type {
 } from "./api.types"
 import type { EpisodeSnapshotIn } from "../../models/Episode" // @demo remove-current-line
 
+
 /**
  * Configuring the apisauce instance.
  */
@@ -33,6 +34,7 @@ export const DEFAULT_API_CONFIG: ApiConfig = {
 export class Api {
   apisauce: ApisauceInstance
   config: ApiConfig
+
 
   /**
    * Set up our API instance. Keep this lightweight!
