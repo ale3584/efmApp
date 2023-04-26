@@ -4,6 +4,7 @@ import { withStatus } from "../extensions/with-status"
 import { AuthenticationApi } from "../services/api/authApi"
 import { LoginFullResult, LogoutResult, RegisterResult, api, refreshTokenResult } from "../services/api"
 import jwtDecode from "jwt-decode"
+import * as storage from "../utils/storage"
 
 type DecodedToken = {
     sub: string,
@@ -46,9 +47,11 @@ export const AuthStoreModel = types
     },
     setAuthToken(value?: string) {
       self.authToken = value
+      storage.saveString("authToken", value)
     },
     setRefreshToken(value?: string) {
       self.refreshToken = value
+      storage.saveString("refreshToken", value)
     },
     setAuthEmail(value: string) {
       self.authEmail = value.replace(/ /g, "")

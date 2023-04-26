@@ -12,6 +12,7 @@ export const PlayerStoreModel = types
   .model("PlayerStore")
   .props({
     players: types.optional(types.array(PlayerModel),[]),
+    player: PlayerModel,
     isLoading: types.boolean,
     error: types.maybeNull(types.string),
     currentPage: types.optional(types.number, 0),
@@ -27,6 +28,9 @@ export const PlayerStoreModel = types
     },
     setPLayers(players){
       self.players = players
+    },
+    setPlayer(value){
+      self.player = value
     },
     setAppendPlayers(players){
       self.players.push(...players)
@@ -50,48 +54,61 @@ export const PlayerStoreModel = types
     async fetchPlayers(){
       const authStore = getParent<RootStore>(self).authStore; 
       self.setIsLoading(true);
-      if(authStore.isTokenValid){
+      // if(authStore.isTokenValid){
         const authenticationApi = new AuthenticationApi(api);
         try{
-          const response = await authenticationApi.getPlayers(authStore.refreshToken, authStore.authToken, 0);
+          const response = await authenticationApi.getPlayers(0);
           if (response.kind === "ok") {
-            console.log(response.players)
+            // console.log(response.players)
             await self.setIsLoading(false);
             await self.setIsEndReached(false)
             await self.setError(null);
             await self.setPLayers(response.players);
-          }else {
-            console.log(response)
+          }else if(response.kind ==="unauthorized"){
             await self.setIsLoading(false);
             await self.setIsEndReached(false)
+            await self.setPlayer(null)
+            await authStore.logout()
+          }
+          else {
+            // console.log(response)
+            await self.setIsLoading(false);
+            await self.setIsEndReached(false)
+            await self.setPlayer(null)
             await self.setError(null);
-            console.tron.error(`Error fetching players: ${JSON.stringify(response)}`, [])
+            console.tron.error(`Error fetching player: ${JSON.stringify(response)}`, [])
           }
         }catch(error){
           await self.setIsLoading(false);
           await self.setIsEndReached(false)
           await self.setError(error.message);
         }
-      }else{
-        await self.setIsLoading(false);
-        await self.setIsEndReached(false)
-        await self.setError(null);
-        await authStore.logout();
-      }
+      // }else{
+      //   await self.setIsLoading(false);
+      //   await self.setIsEndReached(false)
+      //   await self.setError(null);
+      //   await authStore.logout();
+      // }
     },
     async appendPlayers(page: number){
       self.setIsLoading(true);
       const authStore = getParent<RootStore>(self).authStore; 
-      if(authStore.isTokenValid){
+      // if(authStore.isTokenValid){
         const authenticationApi = new AuthenticationApi(api);
         try{
-          const response = await authenticationApi.getPlayers(authStore.refreshToken, authStore.authToken, page);
+          const response = await authenticationApi.getPlayers(page);
           if (response.kind === "ok") {
             await self.setIsLoading(false);
             await self.setIsEndReached(false)
             await self.setError(null);
             await self.setAppendPlayers(response.players);
-          }else {
+          }else if(response.kind ==="unauthorized"){
+            await self.setIsLoading(false);
+            await self.setIsEndReached(false)
+            await self.setPLayers([])
+            await authStore.logout()
+          }
+          else {
             console.log(response)
             await self.setIsLoading(false);
             await self.setIsEndReached(false)
@@ -105,13 +122,45 @@ export const PlayerStoreModel = types
           await self.setPLayers([])
           await self.setError(error.message);
         }
-      }else{
-        await self.setIsLoading(false);
-        await self.setIsEndReached(false)
-        await self.setPLayers({PlayerModel:[]})
-        await self.setError(null);
-        await authStore.logout();
-      }
+      // }else{
+      //   await self.setIsLoading(false);
+      //   await self.setIsEndReached(false)
+      //   await self.setPLayers({PlayerModel:[]})
+      //   await self.setError(null);
+      //   await authStore.logout();
+      // }
+    },
+    async fetchPlayer(playerid: number){
+      const authStore = getParent<RootStore>(self).authStore; 
+      self.setIsLoading(true);
+      // if(authStore.isTokenValid){
+        const authenticationApi = new AuthenticationApi(api);
+        try{
+          const response = await authenticationApi.getPlayer(playerid);
+          if (response.kind === "ok") {
+            // console.log(response.players)
+            await self.setIsLoading(false);
+            await self.setIsEndReached(false)
+            await self.setError(null);
+            await self.setPlayer(response.player);
+          }else if(response.kind ==="unauthorized"){
+            await self.setIsLoading(false);
+            await self.setIsEndReached(false)
+            await self.setPLayers([])
+            await authStore.logout()
+          }
+          else {
+            // console.log(response)
+            await self.setIsLoading(false);
+            await self.setIsEndReached(false)
+            await self.setError(null);
+            console.tron.error(`Error fetching players: ${JSON.stringify(response)}`, [])
+          }
+        }catch(error){
+          await self.setIsLoading(false);
+          await self.setIsEndReached(false)
+          await self.setError(error.message);
+        }
     },
   })) // eslint-disable-line @typescript-eslint/no-unused-vars
 

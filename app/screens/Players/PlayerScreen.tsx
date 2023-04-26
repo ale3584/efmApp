@@ -36,23 +36,19 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
       playerStore: { IsEndReached, IsLoading },
     } = useStores()
 
-    const {
-      authStore: { logout, isTokenValid },
-    } = useStores()
-
     const onfetchPlayers = async () => {
       if (IsLoading) {
         return
       }
 
-      if (isTokenValid) {
-        await playerStore.fetchPlayers()
-        await playerStore.setIsEndReached(false)
-        // await setData([...data, ...playerStore.players.slice()])
-        await setPage(page + 1)
-      } else {
-        await logout()
-      }
+      // if (isTokenValid) {
+      await playerStore.fetchPlayers()
+      await playerStore.setIsEndReached(false)
+      // await setData([...data, ...playerStore.players.slice()])
+      await setPage(page + 1)
+      // } else {
+      // await logout()
+      // }
     }
 
     useEffect(() => {

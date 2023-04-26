@@ -5,45 +5,47 @@ import {
   ApiPlayersResponse,
   LoginFullResult,
   LogoutResult,
+  Player,
   RegisterResult,
   refreshTokenResult,
 } from "./api.types"
 import { PlayerSnapshotIn } from "../../models/Player"
-import { useStores } from "app/models"
+import * as storage from "../../utils/storage"
 
 export class AuthenticationApi {
   private api: Api
 
   constructor(api: Api) {
     this.api = api
-    const { authStore } = useStores()
 
     this.api.apisauce.addAsyncRequestTransform((request) => async () => {
-      await newFunction()
+      const authToken = await storage.loadString("authToken")
+      const refreshToken = await storage.loadString("refreshToken")
+      await newFunction(authToken, refreshToken)
 
-      function newFunction() {
-        if (authStore.authToken) {
-          request.headers.Authorization = "Bearer " + authStore.authToken
+      function newFunction(authToken, refreshToken) {
+        if (authToken) {
+          request.headers.Authorization = "Bearer " + authToken
         }
-        if (authStore.refreshToken) {
-          request.headers.refreshToken = authStore.refreshToken
+        if (refreshToken) {
+          request.headers.refreshToken = refreshToken
         }
       }
     })
 
     this.api.apisauce.addAsyncResponseTransform(async (response) => {
       if (response.data.code === 401 || response.data.code === 403) {
-        const refToken = await authStore.refreshToken
+        const refreshtoken = storage.loadString("refreshToken")
         const response: ApiResponse<any> = await this.api.apisauce.get("/auth/refreshtoken", {
-          refreshToken: refToken,
+          refreshToken: refreshtoken,
         })
         const res = response.data
         if (!res.success) {
           // if refreshToken invalid, logout
-          await authStore.logout()
+          // await authStore.logout()
         } else {
-          await authStore.setAuthToken(response.data.accessToken)
-          await authStore.setRefreshToken(response.data.refreshToken)
+          await storage.saveString("authToken",response.data.accessToken)
+          await storage.saveString("refreshToken",response.data.refreshToken)
           // retry
           const data = await this.api.apisauce.any(response.config)
           // replace data
@@ -153,12 +155,8 @@ export class AuthenticationApi {
   }
 
   async getPlayers(
-    refreshToken: string,
-    accessToken: string,
     curPage: number,
   ): Promise<{ kind: "ok"; players: PlayerSnapshotIn[] } | GeneralApiProblem> {
-    this.api.setAuthToken(accessToken)
-    this.api.setRefreshToken(refreshToken)
     const response: ApiResponse<ApiPlayersResponse> = await this.api.apisauce.get("/players", {
       page: curPage,
     })
@@ -179,6 +177,33 @@ export class AuthenticationApi {
       }))
 
       return { kind: "ok", players }
+    } catch (e) {
+      if (__DEV__) {
+        console.tron.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
+      }
+      return { kind: "bad-data" }
+    }
+  }
+
+  async getPlayer(
+    playerid: number,
+  ): Promise<{ kind: "ok"; player: PlayerSnapshotIn } | GeneralApiProblem> {
+    const response: ApiResponse<Player> = await this.api.apisauce.get(`/players/${playerid}`)
+
+    // the typical ways to die when calling an api
+    if (!response.ok) {
+      const problem = getGeneralApiProblem(response)
+      if (problem) return problem
+    }
+
+    // transform the data into the format we are expecting
+    try {
+      const rawData = response.data;
+
+      // This is where we transform the data into the shape we expect for our MST model.
+      const player: PlayerSnapshotIn = rawData;
+
+      return { kind: "ok", player }
     } catch (e) {
       if (__DEV__) {
         console.tron.error(`Bad data: ${e.message}\n${response.data}`, e.stack)

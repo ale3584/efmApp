@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import React, { FC, useEffect, useState } from "react"
 import { observer } from "mobx-react-lite"
 import { Image, ScrollView, StyleSheet, View } from "react-native"
 import { AppStackScreenProps } from "../../navigators"
@@ -6,8 +6,8 @@ import { AntDesign } from "@expo/vector-icons"
 import { ITEM_HEIGHT, SPACING, width, height, TO_COLOR, FROM_COLOR } from "../HomeScreen"
 import * as Animatable from "react-native-animatable"
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg"
-import { SafeAreaView } from "react-native-safe-area-context"
 import { Text } from "native-base"
+import { useStores } from "app/models"
 
 interface PlayerDetailsScreenProps extends AppStackScreenProps<"PlayerDetails"> {}
 
@@ -17,8 +17,27 @@ const TOP_HEADER_HEIGHT = height * 0.3
 export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
   function PlayerDetailsScreen({ navigation, route }) {
     const { item } = route.params
+    const [isloading, setIsloading] = useState(false)
+    const { playerStore } = useStores()
+    const [player, setPlayer] = useState({})
+
+    const onfetchPlayer = async () => {
+      if (isloading) {
+        return
+      }
+
+      await setIsloading(true)
+      await playerStore.fetchPlayer(item.id)
+      setPlayer(playerStore.player)
+      await setIsloading(false)
+    }
+
+    useEffect(() => {
+      onfetchPlayer()
+    }, null)
+
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <AntDesign
           name="arrowleft"
           size={28}
@@ -26,7 +45,7 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
           style={{
             padding: 12,
             position: "absolute",
-            top: SPACING * 2,
+            top: SPACING * 2 + 5,
             left: SPACING,
             zIndex: 2,
           }}
@@ -42,7 +61,12 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
               <Stop offset="1" stopColor={TO_COLOR} />
             </LinearGradient>
           </Defs>
-          <Rect rx={16} width="100%" height={TOP_HEADER_HEIGHT + 32} fill="url(#grad)" />
+          <Rect
+            // rx={16}
+            width="100%"
+            height={TOP_HEADER_HEIGHT + 32}
+            fill="url(#grad)"
+          />
         </Svg>
         <View
           style={[
@@ -56,7 +80,10 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
             },
           ]}
         >
-          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.name}>{player.name}</Text>
+          <Text style={styles.rating}>{player.overall}</Text>
+          <Text style={styles.mainPosition}>{player.registeredPosition}</Text>
+          <Text style={styles.playingStyle}>{player.playingStyles}</Text>
           <Image
             style={styles.image}
             source={{ uri: "https://api.efootballdb.com/assets/2022/players/7511_.png" }}
@@ -117,12 +144,12 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
                 </Animatable.View>
               </View>
               <View>
-                <Text>Content</Text>
+                <Text>{player.name}</Text>
               </View>
             </ScrollView>
           </View>
         </View>
-      </SafeAreaView>
+      </View>
     )
   },
 )
@@ -148,11 +175,32 @@ const styles = StyleSheet.create({
     top: TOP_HEADER_HEIGHT - ITEM_HEIGHT * 0.8,
     width: ITEM_HEIGHT * 0.8,
   },
+  mainPosition: {
+    fontSize: 18,
+    fontWeight: "700",
+    left: SPACING,
+    position: "absolute",
+    top: TOP_HEADER_HEIGHT - SPACING * 2,
+  },
   name: {
     fontSize: 18,
     fontWeight: "700",
     left: SPACING,
     position: "absolute",
-    top: TOP_HEADER_HEIGHT - SPACING * 3,
+    top: TOP_HEADER_HEIGHT - SPACING * 8,
+  },
+  playingStyle: {
+    fontSize: 18,
+    fontWeight: "700",
+    left: SPACING,
+    position: "absolute",
+    top: TOP_HEADER_HEIGHT - SPACING * 4,
+  },
+  rating: {
+    fontSize: 18,
+    fontWeight: "700",
+    left: SPACING,
+    position: "absolute",
+    top: TOP_HEADER_HEIGHT - SPACING * 6,
   },
 })
