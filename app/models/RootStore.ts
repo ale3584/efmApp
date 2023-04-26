@@ -10,7 +10,7 @@ import { PlayerStoreModel } from "./PlayerStore"
 export const RootStoreModel = types.model("RootStore").props({
   authenticationStore: types.optional(AuthenticationStoreModel, {}),
   episodeStore: types.optional(EpisodeStoreModel, {}),
-  authStore: types.optional(AuthStoreModel, {}),
+  authStore: types.optional(AuthStoreModel, { error: ""}),
   playerStore: types.optional(PlayerStoreModel, {players:[], isLoading: false, error: null, isEndReached: false}),
 })
 

@@ -22,6 +22,7 @@ export const AuthStoreModel = types
     authUser: "",
     authToken: types.maybe(types.string),
     refreshToken: types.maybe(types.string),
+    error: types.maybe(types.string),
   })
   .views((self) => ({
     get isAuthenticate() {
@@ -33,6 +34,9 @@ export const AuthStoreModel = types
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(self.authEmail))
         return "must be a valid email address"
       return ""
+    },
+    get isError(){
+      return self.error !== ""
     },
   }))
   .actions(withSetPropAction)
@@ -52,6 +56,9 @@ export const AuthStoreModel = types
     setAuthUser(value: string) {
       self.authUser = value.replace(/ /g, "")
     },
+    setError(value: string){
+      self.error = value;
+    }
   }))
   .actions((self) => ({
     login: flow(function* (emailAddress: string, password: string) {
@@ -71,6 +78,7 @@ export const AuthStoreModel = types
       } else {
         self.setStatus("error");
         self.setAuthenticated(false);
+        self.setError(`Error fetching players: ${JSON.stringify(result)}`)
         __DEV__ && console.tron.log(result.kind);
       }
     }),
@@ -102,8 +110,6 @@ export const AuthStoreModel = types
 
       const authenticationApi = new AuthenticationApi(api);
       const result: LogoutResult = yield authenticationApi.logout(self.refreshToken, self.authToken);
-
-      console.log(result)
       if (result.kind === "ok") {
         self.setStatus("done");
         self.setAuthenticated(false);
@@ -122,7 +128,6 @@ export const AuthStoreModel = types
       const authenticationApi = new AuthenticationApi(api);
       const result: refreshTokenResult = yield authenticationApi.refreshToken(self.refreshToken);
 
-      console.log(result)
       if (result.kind === "ok") {
         self.setStatus("done");
         self.setAuthenticated(true);

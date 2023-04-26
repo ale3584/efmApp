@@ -7,11 +7,22 @@ import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 import Svg, { Image } from "react-native-svg"
 import styles from "./styles/login"
-import { NativeBaseProvider } from "native-base"
+import {
+  Alert,
+  Box,
+  CloseIcon,
+  HStack,
+  IconButton,
+  NativeBaseProvider,
+  VStack,
+  Text as TextBase,
+  Collapse,
+} from "native-base"
 
 interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
+  const [iserror, setIserror] = useState(false)
   const { navigation } = _props
   const authPasswordInput = useRef<TextInput>()
   const { height, width } = Dimensions.get("window")
@@ -25,7 +36,61 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
 
   const error = isSubmitted ? validationError : ""
 
-  const onLogin = async (userName, password) => await authStore.login(userName, password)
+  const onLogin = async (userName, password) => {
+    await authStore.login(userName, password)
+    if (authStore.isError) {
+      await setIserror(true)
+      await alertMessage(authStore.error)
+    }
+  }
+
+  const alertMessage = (message) => {
+    return (
+      <Box w="100%" alignItems="center">
+        <Collapse isOpen={iserror}>
+          <Alert maxW="400" status="error">
+            <VStack space={1} flexShrink={1} w="100%">
+              <HStack flexShrink={1} space={2} alignItems="center" justifyContent="space-between">
+                <HStack flexShrink={1} space={2} alignItems="center">
+                  <Alert.Icon />
+                  <TextBase
+                    fontSize="md"
+                    fontWeight="medium"
+                    _dark={{
+                      color: "coolGray.800",
+                    }}
+                  >
+                    Please try again later!
+                  </TextBase>
+                </HStack>
+                <IconButton
+                  variant="unstyled"
+                  _focus={{
+                    borderWidth: 0,
+                  }}
+                  icon={<CloseIcon size="3" />}
+                  _icon={{
+                    color: "coolGray.600",
+                  }}
+                  onPress={() => setIserror(false)}
+                />
+              </HStack>
+              <Box
+                pl="6"
+                _dark={{
+                  _text: {
+                    color: "coolGray.600",
+                  },
+                }}
+              >
+                {message}
+              </Box>
+            </VStack>
+          </Alert>
+        </Collapse>
+      </Box>
+    )
+  }
 
   function register() {
     navigation.navigate("Register")
