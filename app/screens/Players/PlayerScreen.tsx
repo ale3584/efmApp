@@ -14,10 +14,9 @@ import {
 } from "react-native"
 import { StackScreenProps } from "@react-navigation/stack"
 import { AppStackScreenProps } from "app/navigators"
-import { Screen, Text } from "app/components"
+import { Text } from "app/components"
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg"
 import { useStores } from "app/models"
-import * as Animatable from "react-native-animatable"
 
 const { height } = Dimensions.get("window")
 const ITEM_HEIGHT = height * 0.18
