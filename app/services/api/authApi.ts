@@ -21,6 +21,11 @@ export class AuthenticationApi {
     this.api.apisauce.addAsyncRequestTransform((request) => async () => {
       const authToken = await storage.loadString("authToken")
       const refreshToken = await storage.loadString("refreshToken")
+      if(request.url.startsWith("/auth")){
+        delete request.headers.refreshToken
+        delete request.headers.Authorization
+      }
+
       await newFunction(authToken, refreshToken)
 
       function newFunction(authToken, refreshToken) {
@@ -34,7 +39,7 @@ export class AuthenticationApi {
     })
 
     this.api.apisauce.addAsyncResponseTransform(async (response) => {
-      if (response.data.code === 401 || response.data.code === 403) {
+      if (response.status === 401 || response.status === 403) {
         const refreshtoken = storage.loadString("refreshToken")
         const response: ApiResponse<any> = await this.api.apisauce.get("/auth/refreshtoken", {
           refreshToken: refreshtoken,
@@ -94,20 +99,21 @@ export class AuthenticationApi {
   async signup(username: string, email: string, password: string): Promise<RegisterResult> {
     try {
       const response: ApiResponse<any> = await this.api.apisauce.post("/auth/signup", {
-        username,
-        email,
-        password,
+        username: username,
+        email: email,
+        password: password
       })
+      __DEV__ && console.tron.log(response)
 
       if (!response.ok) {
         const problem = getGeneralApiProblem(response)
-        if (problem) return problem
+        if (problem) return { kind: problem.kind, message:  "message" in response.data ? response.data.message : "" }     
       }
 
-      return { kind: "ok" }
+      return { kind: "ok", message: response.data.message }
     } catch (e) {
       __DEV__ && console.tron.log(e.message)
-      return { kind: "bad-data" }
+      return { kind: "bad-data", message: e.message }
     }
   }
 

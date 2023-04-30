@@ -17,6 +17,7 @@ import {
   VStack,
   Text as TextBase,
   Collapse,
+  KeyboardAvoidingView,
 } from "native-base"
 
 interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
@@ -133,36 +134,38 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
               />
             </Svg>
           </View>
-          <View style={styles.formInputContainer}>
-            <TextField
-              containerStyle={$screenContentContainer}
-              value={authUser}
-              onChangeText={setAuthUser}
-              autoCapitalize="none"
-              autoComplete="email"
-              autoCorrect={false}
-              keyboardType="email-address"
-              labelTx="loginScreen.userFieldLabel"
-              placeholderTx="loginScreen.userFieldLabel"
-              helper={error}
-              status={error ? "error" : undefined}
-              onSubmitEditing={() => authPasswordInput.current?.focus()}
-            />
-            <TextField
-              containerStyle={$screenContentContainer}
-              ref={authPasswordInput}
-              value={authPassword}
-              onChangeText={setAuthPassword}
-              autoCapitalize="none"
-              autoComplete="password"
-              autoCorrect={false}
-              secureTextEntry={isAuthPasswordHidden}
-              labelTx="loginScreen.passwordFieldLabel"
-              placeholderTx="loginScreen.passwordFieldPlaceholder"
-              onSubmitEditing={() => onLogin(authUser, authPassword)}
-              RightAccessory={PasswordRightAccessory}
-            />
-          </View>
+          <KeyboardAvoidingView>
+            <View style={styles.formInputContainer}>
+              <TextField
+                containerStyle={$screenContentContainer}
+                value={authUser}
+                onChangeText={setAuthUser}
+                autoCapitalize="none"
+                autoComplete="email"
+                autoCorrect={false}
+                keyboardType="email-address"
+                labelTx="loginScreen.userFieldLabel"
+                placeholderTx="loginScreen.userFieldLabel"
+                helper={error}
+                status={error ? "error" : undefined}
+                onSubmitEditing={() => authPasswordInput.current?.focus()}
+              />
+              <TextField
+                containerStyle={$screenContentContainer}
+                ref={authPasswordInput}
+                value={authPassword}
+                onChangeText={setAuthPassword}
+                autoCapitalize="none"
+                autoComplete="password"
+                autoCorrect={false}
+                secureTextEntry={isAuthPasswordHidden}
+                labelTx="loginScreen.passwordFieldLabel"
+                placeholderTx="loginScreen.passwordFieldPlaceholder"
+                onSubmitEditing={() => onLogin(authUser, authPassword)}
+                RightAccessory={PasswordRightAccessory}
+              />
+            </View>
+          </KeyboardAvoidingView>
           <View style={styles.bottomContainer}>
             <Button
               testID="login-button"

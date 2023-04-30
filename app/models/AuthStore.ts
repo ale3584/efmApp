@@ -104,6 +104,7 @@ export const AuthStoreModel = types
       } else {
         self.setStatus("error");
         self.setAuthenticated(false);
+        self.setError(result.message)
         __DEV__ && console.tron.log(result.kind);
       }
     }),
@@ -116,12 +117,14 @@ export const AuthStoreModel = types
       if (result.kind === "ok") {
         self.setStatus("done");
         self.setAuthenticated(false);
-        self.authToken = "";
-        self.refreshToken = "";
+        self.setAuthToken("");
+        self.setRefreshToken("");
         self.authEmail = "";
       } else {
         self.setStatus("error");
         self.setAuthenticated(false);
+        self.setAuthToken("");
+        self.setRefreshToken("");
         __DEV__ && console.tron.log(result.kind);
       }
     }),
