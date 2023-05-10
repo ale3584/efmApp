@@ -63,7 +63,7 @@ export type refreshTokenResult = {
   accessToken:"",
   kind: "ok" | void | GeneralApiProblem,
 }
-export type RegisterResult = { kind: string, message: string };
+export type RegisterResult = { kind: string, message: string[] };
 export type LogoutResult = { kind: "ok" } | GeneralApiProblem;
 export interface playedPositions {
   id: number,

@@ -107,7 +107,7 @@ export class AuthenticationApi {
 
       if (!response.ok) {
         const problem = getGeneralApiProblem(response)
-        if (problem) return { kind: problem.kind, message:  "message" in response.data ? response.data.message : "" }     
+        if (problem) return { kind: problem.kind, message:  "messageList" in response.data ? response.data.messageList : [] }     
       }
 
       return { kind: "ok", message: response.data.message }

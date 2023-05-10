@@ -23,7 +23,7 @@ export const AuthStoreModel = types
     authUser: "",
     authToken: types.maybe(types.string),
     refreshToken: types.maybe(types.string),
-    error: types.maybe(types.string),
+    error: types.array(types.string),
   })
   .views((self) => ({
     get isAuthenticate() {
@@ -37,7 +37,7 @@ export const AuthStoreModel = types
       return ""
     },
     get isError(){
-      return self.error !== ""
+      return self.error.length === 0
     },
   }))
   .actions(withSetPropAction)
@@ -59,8 +59,9 @@ export const AuthStoreModel = types
     setAuthUser(value: string) {
       self.authUser = value.replace(/ /g, "")
     },
-    setError(value: string){
-      self.error = value;
+    setError(value?: string[]){
+      self.error = undefined
+      self.error.push(...value);
     }
   }))
   .actions((self) => ({
@@ -81,7 +82,7 @@ export const AuthStoreModel = types
       } else {
         self.setStatus("error");
         self.setAuthenticated(false);
-        self.setError(`Error fetching players: ${JSON.stringify(result)}`)
+        self.setError([`Error fetching players: ${JSON.stringify(result)}`])
         __DEV__ && console.tron.log(result.kind);
       }
     }),

@@ -17,6 +17,7 @@ import { AppStackScreenProps } from "app/navigators"
 import { Text } from "app/components"
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg"
 import { useStores } from "app/models"
+import { Player, PlayerModel } from "app/models/Player"
 
 const { height } = Dimensions.get("window")
 const ITEM_HEIGHT = height * 0.18
@@ -58,12 +59,10 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
     const handleEndReached = async () => {
       if (!IsEndReached) {
         await playerStore.setIsEndReached(true)
-        await setRefreshing(true)
         await playerStore.appendPlayers(page)
         await playerStore.setIsEndReached(false)
         // await setData([...data, ...playerStore.players.slice()])
         await setPage(page + 1)
-        await setRefreshing(false)
       }
     }
 
@@ -88,7 +87,7 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
         onPress={() => {
           navigation.navigate("PlayerDetails", { item })
         }}
-        style={{ marginBottom: SPACING, height: ITEM_HEIGHT }}
+        style={styles.itemContainer}
       >
         <Svg height="100%" width="100%" style={StyleSheet.absoluteFillObject}>
           <Defs>
@@ -100,13 +99,7 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
           <Rect rx={16} width="100%" height="100%" fill="url(#grad)" />
         </Svg>
         <View style={{ flex: 1, padding: SPACING }}>
-          <View
-            style={[
-              StyleSheet.absoluteFillObject,
-              // eslint-disable-next-line react-native/no-inline-styles, react-native/no-color-literals
-              { borderRadius: 16, padding: SPACING },
-            ]}
-          >
+          <View style={[StyleSheet.absoluteFillObject, styles.absoluteFill]}>
             <Text style={styles.name}>{item.name}</Text>
             <Text>{item.overall}</Text>
             <Image
@@ -147,6 +140,10 @@ const $root: ViewStyle = {
 }
 
 const styles = StyleSheet.create({
+  absoluteFill: {
+    borderRadius: 16,
+    padding: SPACING,
+  },
   image: {
     bottom: 0,
     height: ITEM_HEIGHT * 0.8,
@@ -154,6 +151,10 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     right: SPACING,
     width: ITEM_HEIGHT * 0.8,
+  },
+  itemContainer: {
+    height: ITEM_HEIGHT,
+    marginBottom: SPACING,
   },
   name: {
     fontSize: 20,

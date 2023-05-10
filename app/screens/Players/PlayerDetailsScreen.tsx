@@ -4,10 +4,10 @@ import { Image, ScrollView, StyleSheet, View } from "react-native"
 import { AppStackScreenProps } from "../../navigators"
 import { AntDesign } from "@expo/vector-icons"
 import { ITEM_HEIGHT, SPACING, width, height, TO_COLOR, FROM_COLOR } from "../HomeScreen"
-import * as Animatable from "react-native-animatable"
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg"
 import { Text } from "native-base"
 import { useStores } from "app/models"
+import { PStyleToString, Position } from "app/models/Player"
 
 interface PlayerDetailsScreenProps extends AppStackScreenProps<"PlayerDetails"> {}
 
@@ -19,7 +19,6 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
     const { item } = route.params
     const [isloading, setIsloading] = useState(false)
     const { playerStore } = useStores()
-    const [player, setPlayer] = useState({})
 
     const onfetchPlayer = async () => {
       if (isloading) {
@@ -28,7 +27,6 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
 
       await setIsloading(true)
       await playerStore.fetchPlayer(item.id)
-      setPlayer(playerStore.player)
       await setIsloading(false)
     }
 
@@ -36,19 +34,27 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
       onfetchPlayer()
     }, null)
 
+    const renderSection = (title: string, data: Record<any, any>) => {
+      return (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{title}</Text>
+          {Object.entries(data).map(([key, value]) => (
+            <View key={key} style={styles.row}>
+              <Text style={styles.key}>{key}:</Text>
+              <Text style={styles.value}>{value}</Text>
+            </View>
+          ))}
+        </View>
+      )
+    }
+
     return (
       <View style={{ flex: 1 }}>
         <AntDesign
           name="arrowleft"
           size={28}
           // eslint-disable-next-line react-native/no-inline-styles
-          style={{
-            padding: 12,
-            position: "absolute",
-            top: SPACING * 2 + 5,
-            left: SPACING,
-            zIndex: 2,
-          }}
+          style={styles.arrowLeftIcon}
           color={"#333"}
           onPress={() => {
             navigation.goBack()
@@ -80,16 +86,21 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
             },
           ]}
         >
-          <Text style={styles.name}>{player.name}</Text>
-          <Text style={styles.rating}>{player.overall}</Text>
-          <Text style={styles.mainPosition}>{player.registeredPosition}</Text>
-          <Text style={styles.playingStyle}>{player.playingStyles}</Text>
+          <Text style={styles.name}>{playerStore.player.name}</Text>
+          <Text style={styles.rating}>{playerStore.player.overall}</Text>
+          <Text style={styles.mainPosition}>{Position[playerStore.player.registeredPosition]}</Text>
+          <Text style={styles.playingStyle}>
+            {PStyleToString[playerStore.player.playingStyles]}
+          </Text>
           <Image
             style={styles.image}
             source={{ uri: "https://api.efootballdb.com/assets/2022/players/7511_.png" }}
           />
-          <View style={styles.bg}>
-            <ScrollView style={{ flex: 1 }}>
+          <View
+            // style={{ flex: 1 }}
+            style={styles.bg}
+          >
+            <View style={{ paddingBottom: 10 }}>
               <View
                 // eslint-disable-next-line react-native/no-inline-styles
                 style={{
@@ -97,9 +108,9 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
                   justifyContent: "space-evenly",
                 }}
               >
-                <Animatable.View
-                  animation="bounceIn"
-                  delay={1 + 1 * 100}
+                <View
+                  // animation="bounceIn"
+                  // delay={1 + 1 * 100}
                   // eslint-disable-next-line react-native/no-inline-styles, react-native/no-color-literals
                   style={{
                     backgroundColor: "blue",
@@ -111,10 +122,10 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
                   }}
                 >
                   <AntDesign name="home" size={24} color={"white"} />
-                </Animatable.View>
-                <Animatable.View
-                  animation="bounceIn"
-                  delay={1 + 2 * 100}
+                </View>
+                <View
+                  // animation="bounceIn"
+                  // delay={1 + 2 * 100}
                   // eslint-disable-next-line react-native/no-inline-styles, react-native/no-color-literals
                   style={{
                     backgroundColor: "yellow",
@@ -126,10 +137,10 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
                   }}
                 >
                   <AntDesign name="antdesign" size={24} color={"white"} />
-                </Animatable.View>
-                <Animatable.View
-                  animation="bounceIn"
-                  delay={1 + 3 * 100}
+                </View>
+                <View
+                  // animation="bounceIn"
+                  // delay={1 + 3 * 100}
                   // eslint-disable-next-line react-native/no-inline-styles, react-native/no-color-literals
                   style={{
                     backgroundColor: "pink",
@@ -141,12 +152,28 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
                   }}
                 >
                   <AntDesign name="book" size={24} color={"white"} />
-                </Animatable.View>
+                </View>
               </View>
-              <View>
-                <Text>{player.name}</Text>
-              </View>
-            </ScrollView>
+              <ScrollView>
+                {playerStore.player.playedPositions &&
+                  renderSection("Played Positions", playerStore.player.playedPositions)}
+                {playerStore.player.playedPositionsRating &&
+                  renderSection(
+                    "Played Positions Rating",
+                    playerStore.player.playedPositionsRating,
+                  )}
+                {playerStore.player.teamPlayStyle &&
+                  renderSection("Team Play Style", playerStore.player.teamPlayStyle)}
+                {playerStore.player.playerSkills &&
+                  renderSection("Player Skills", playerStore.player.playerSkills)}
+                {playerStore.player.playerStylesAI &&
+                  renderSection("Player Styles AI", playerStore.player.playerStylesAI)}
+                {playerStore.player.playerAbility &&
+                  renderSection("Player Ability", playerStore.player.playerAbility)}
+                {/* {playerStore.player.playerBasicInfo &&
+                  renderSection("Player Basic Info", playerStore.player.playerBasicInfo)} */}
+              </ScrollView>
+            </View>
           </View>
         </View>
       </View>
@@ -155,10 +182,18 @@ export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
 )
 
 const styles = StyleSheet.create({
+  arrowLeftIcon: {
+    left: SPACING,
+    padding: 12,
+    position: "absolute",
+    top: SPACING * 2 + 5,
+    zIndex: 2,
+  },
   // eslint-disable-next-line react-native/no-color-literals
   bg: {
     backgroundColor: "white",
     borderRadius: 32,
+    flex: 1,
     height,
     padding: SPACING,
     paddingTop: 32 + SPACING,
@@ -175,12 +210,16 @@ const styles = StyleSheet.create({
     top: TOP_HEADER_HEIGHT - ITEM_HEIGHT * 0.8,
     width: ITEM_HEIGHT * 0.8,
   },
+  key: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
   mainPosition: {
     fontSize: 18,
     fontWeight: "700",
     left: SPACING,
     position: "absolute",
-    top: TOP_HEADER_HEIGHT - SPACING * 2,
+    top: TOP_HEADER_HEIGHT - SPACING * 4,
   },
   name: {
     fontSize: 18,
@@ -194,7 +233,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     left: SPACING,
     position: "absolute",
-    top: TOP_HEADER_HEIGHT - SPACING * 4,
+    top: TOP_HEADER_HEIGHT - SPACING * 2,
   },
   rating: {
     fontSize: 18,
@@ -202,5 +241,21 @@ const styles = StyleSheet.create({
     left: SPACING,
     position: "absolute",
     top: TOP_HEADER_HEIGHT - SPACING * 6,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 5,
+  },
+  section: {
+    marginBottom: SPACING,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  value: {
+    fontSize: 14,
   },
 })

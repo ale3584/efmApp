@@ -1,6 +1,6 @@
 import React, { FC, useMemo, useRef, useState } from "react"
 import { observer } from "mobx-react-lite"
-import { Dimensions, TextInput, ViewStyle, View } from "react-native"
+import { Dimensions, TextInput, ViewStyle, View, SafeAreaView } from "react-native"
 import { AppStackScreenProps } from "../navigators"
 import { Button, Icon, Screen, Text, TextField, TextFieldAccessoryProps } from "../components"
 import { useStores } from "../models"
@@ -65,7 +65,7 @@ export const RegisterScreen: FC<RegisterScreenProps> = observer(function Registe
     [isAuthPasswordHidden],
   )
 
-  const ToastAlert = ({ id, status, variant, title, description, isClosable }) => (
+  const ToastAlert = ({ status, variant, title, description }) => (
     <Alert maxWidth="100%" alignSelf="center" flexDirection="row" status={status} variant={variant}>
       <VStack space={1} flexShrink={1} w="100%">
         <HStack flexShrink={1} alignItems="center" justifyContent="space-between">
@@ -80,16 +80,6 @@ export const RegisterScreen: FC<RegisterScreenProps> = observer(function Registe
               {title}
             </TextBase>
           </HStack>
-          {isClosable ? (
-            <IconButton
-              variant="unstyled"
-              icon={<CloseIcon size="3" />}
-              _icon={{
-                color: variant === "solid" ? "lightText" : "darkText",
-              }}
-              onPress={() => toast.close(id)}
-            />
-          ) : null}
         </HStack>
         <TextBase
           px={"6"}
@@ -106,17 +96,18 @@ export const RegisterScreen: FC<RegisterScreenProps> = observer(function Registe
       if (authStore.status === "done") {
         setIsOpen(!isOpen)
       } else if (authStore.status === "error") {
-        const item = {
-          id: 0,
-          status: "error",
-          variant: "solid",
-          title: "Registaration Error",
-          description: authStore.error,
-          isClosable: true,
-        }
-        toast.show({
-          placement: "top",
-          render: () => <ToastAlert {...item} />,
+        authStore.error.forEach((element) => {
+          const item = {
+            status: "error",
+            variant: "solid",
+            title: "Registaration Error",
+            description: element,
+            isClosable: true,
+          }
+          toast.show({
+            placement: "top",
+            render: () => <ToastAlert {...item} />,
+          })
         })
       }
     })

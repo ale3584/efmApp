@@ -1,6 +1,77 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree"
 import { withSetPropAction } from "./helpers/withSetPropAction"
 
+export enum Position {
+  GK = 0,
+  CB = 1,
+  LB = 2,
+  RB = 3,
+  DMF = 4,
+  CMF = 5,
+  LMF = 6,
+  RMF = 7,
+  AMF = 8,
+  LWF = 9,
+  RWF = 10,
+  SS = 11,
+  CF = 12,
+}
+
+
+export enum PStyle {
+  None = 0,
+  GoalPoacher = 1,
+  DummyRunner = 2,
+  FoxInTheBox = 3,
+  ProlificWinger = 4,
+  ClassicNo10 = 5,
+  HolePlayer = 6,
+  BoxToBox = 7,
+  AnchorMan = 8,
+  TheDestroyer = 9,
+  ExtraFrontman = 10,
+  OffensiveFullBack = 11,
+  DefensiveFullBack = 12,
+  DeepLyingForward = 13,
+  CreativePlaymaker = 14,
+  BuildUp = 15,
+  OffensiveGoalkeeper = 16,
+  DefensiveGoalkeeper = 17,
+  RoamingFlank = 18,
+  CrossSpecialist = 19,
+  Orchestrator = 20,
+  FullBackFinisher = 21,
+  TargetMan = 22
+}
+
+
+export const PStyleToString = [
+  "",
+  "Goal Poacher",
+  "Dummy Runner",
+  "Fox in the Box",
+  "Prolific Winger",
+  "Classic No. 10",
+  "Hole Player",
+  "Box-to-Box" ,
+  "Anchor Man" ,
+  "The Destroyer" ,
+  "Extra Frontman" ,
+  "Offensive Full-back" ,
+  "Defensive Full-back" ,
+  "Deep-Lying Forward" ,
+  "Creative Playmaker" ,
+  "Build Up" ,
+  "Offensive Goalkeeper" ,
+  "Defensive Goalkeeper" ,
+  "Roaming Flank" ,
+  "Cross Specialist" ,
+  "Orchestrator" ,
+  "Full-back Finisher" ,
+  "Target Man" 
+]
+
+
 interface playedPositions {
   id: number,
   gk: number,
