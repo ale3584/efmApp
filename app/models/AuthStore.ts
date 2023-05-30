@@ -68,7 +68,7 @@ export const AuthStoreModel = types
     login: flow(function* (emailAddress: string, password: string) {
       self.setStatus("pending");
 
-      const authenticationApi = new AuthenticationApi(api);
+      const authenticationApi = new AuthenticationApi(api, self);
       const result: LoginFullResult = yield authenticationApi.login(
         emailAddress,
         password
@@ -89,7 +89,7 @@ export const AuthStoreModel = types
     signup: flow(function* (username: string, emailAddress: string, password: string) {
       self.setStatus("pending");
 
-      const authenticationApi = new AuthenticationApi(api);
+      const authenticationApi = new AuthenticationApi(api, self);
       const result: RegisterResult = yield authenticationApi.signup(
         username,
         emailAddress,
@@ -113,7 +113,7 @@ export const AuthStoreModel = types
     logout: flow(function* () {
       self.setStatus("pending");
 
-      const authenticationApi = new AuthenticationApi(api);
+      const authenticationApi = new AuthenticationApi(api, self);
       const result: LogoutResult = yield authenticationApi.logout(self.refreshToken, self.authToken);
       if (result.kind === "ok") {
         self.setStatus("done");
@@ -132,7 +132,7 @@ export const AuthStoreModel = types
     refToken: flow(function* () {
       self.setStatus("pending");
 
-      const authenticationApi = new AuthenticationApi(api);
+      const authenticationApi = new AuthenticationApi(api, self);
       const result: refreshTokenResult = yield authenticationApi.refreshToken(self.refreshToken);
 
       if (result.kind === "ok") {

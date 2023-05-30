@@ -94,7 +94,7 @@ export const PlayerStoreModel = types
       self.setIsLoading(true);
       const authStore = getParent<RootStore>(self).authStore; 
       // if(authStore.isTokenValid){
-        const authenticationApi = new AuthenticationApi(api);
+        const authenticationApi = new AuthenticationApi(api, self);
         try{
           const response = await authenticationApi.getPlayers(page);
           if (response.kind === "ok") {
@@ -134,7 +134,7 @@ export const PlayerStoreModel = types
       const authStore = getParent<RootStore>(self).authStore; 
       self.setIsLoading(true);
       // if(authStore.isTokenValid){
-        const authenticationApi = new AuthenticationApi(api);
+        const authenticationApi = new AuthenticationApi(api, self);
         try{
           const response = await authenticationApi.getPlayer(playerid);
           if (response.kind === "ok") {

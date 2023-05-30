@@ -14,9 +14,11 @@ import * as storage from "../../utils/storage"
 
 export class AuthenticationApi {
   private api: Api
+  private authStore: any
 
-  constructor(api: Api) {
+  constructor(api: Api, authStore: any) {
     this.api = api
+    this.authStore = authStore
 
     this.api.apisauce.addAsyncRequestTransform((request) => async () => {
       const authToken = await storage.loadString("authToken")
@@ -47,7 +49,9 @@ export class AuthenticationApi {
         const res = response.data
         if (!res.success) {
           // if refreshToken invalid, logout
-          // await authStore.logout()
+          await storage.remove("authToken")
+          await storage.remove("refreshToken")
+          await this.authStore.logout()
         } else {
           await storage.saveString("authToken",response.data.accessToken)
           await storage.saveString("refreshToken",response.data.refreshToken)

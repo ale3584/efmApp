@@ -77,6 +77,22 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFC93C",
   },
   bg: {},
+  search_input: {
+    flexDirection: "row",
+    width: "95%",
+    borderWidth: 0.3,
+    borderRadius: 20,
+    alignItems: "center",
+    alignSelf: "center",
+    fontSize: 14,
+    marginBottom: 10,
+  },
+  search_icon: {
+    marginLeft: 14,
+    marginTop: 5,
+    width: "10%",
+    alignSelf: "flex-start",
+  },
 })
 
 export default styles

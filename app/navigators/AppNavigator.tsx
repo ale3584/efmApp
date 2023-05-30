@@ -41,10 +41,9 @@ import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
  */
 export type AppStackParamList = {
   Home: undefined
-  Login: undefined // @demo remove-current-line
+  Login: undefined
   Register: undefined
   PlayerDetails: undefined
-  Demo: NavigatorScreenParams<DemoTabParamList> // @demo remove-current-line
   // 🔥 Your screens go here
 }
 

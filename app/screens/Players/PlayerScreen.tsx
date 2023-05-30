@@ -8,16 +8,20 @@ import {
   FlatList,
   Image,
   StyleSheet,
+  TextInput,
   TouchableOpacity,
   View,
   ViewStyle,
 } from "react-native"
+import Modal from "react-native-modal"
 import { StackScreenProps } from "@react-navigation/stack"
 import { AppStackScreenProps } from "app/navigators"
 import { Text } from "app/components"
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg"
 import { useStores } from "app/models"
-import { Player, PlayerModel } from "app/models/Player"
+import { AntDesign } from "@expo/vector-icons"
+import { createDrawerNavigator } from "@react-navigation/drawer"
+import { FiltersScreen } from "./PlayerFiltersScreen"
 
 const { height } = Dimensions.get("window")
 const ITEM_HEIGHT = height * 0.18
@@ -29,8 +33,7 @@ const TO_COLOR = "#3287D6"
 export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> = observer(
   function PlayerScreen(_props) {
     const { navigation } = _props
-    const [refreshing, setRefreshing] = useState(false)
-    // const [data, setData] = useState([])
+    const [modalVisible, setModalVisible] = useState(false)
     const [page, setPage] = useState(0)
     const {
       playerStore,
@@ -42,26 +45,32 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
         return
       }
 
-      // if (isTokenValid) {
       await playerStore.fetchPlayers()
       await playerStore.setIsEndReached(false)
-      // await setData([...data, ...playerStore.players.slice()])
       await setPage(page + 1)
-      // } else {
-      // await logout()
-      // }
     }
 
     useEffect(() => {
       onfetchPlayers()
     }, [])
 
+    const Drawer = createDrawerNavigator()
+
+    useEffect(() => {
+      navigation.setOptions({
+        headerRight: () => (
+          <TouchableOpacity style={{ marginRight: 15 }} onPress={() => setModalVisible(true)}>
+            <AntDesign name="filter" size={24} color="black" />
+          </TouchableOpacity>
+        ),
+      })
+    }, [navigation])
+
     const handleEndReached = async () => {
       if (!IsEndReached) {
         await playerStore.setIsEndReached(true)
         await playerStore.appendPlayers(page)
         await playerStore.setIsEndReached(false)
-        // await setData([...data, ...playerStore.players.slice()])
         await setPage(page + 1)
       }
     }
@@ -126,8 +135,15 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
             ListEmptyComponent={renderEmpty}
             ListFooterComponent={renderFooter(IsLoading)}
             onEndReachedThreshold={0}
-            refreshing={refreshing}
           />
+          <Modal
+            animationIn="slideInRight"
+            animationOut="slideOutRight"
+            isVisible={modalVisible}
+            style={{ margin: 0 }}
+          >
+            <FiltersScreen closeModal={() => setModalVisible(false)} />
+          </Modal>
           {/* <View style={styles.bg} /> */}
         </View>
       </View>
