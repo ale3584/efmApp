@@ -77,21 +77,33 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFC93C",
   },
   bg: {},
-  search_input: {
+  search: {
+    backgroundColor: "#EBE9E9",
+    margin: 10,
+    borderRadius: 5,
     flexDirection: "row",
-    width: "95%",
-    borderWidth: 0.3,
-    borderRadius: 20,
-    alignItems: "center",
-    alignSelf: "center",
-    fontSize: 14,
-    marginBottom: 10,
   },
-  search_icon: {
-    marginLeft: 14,
-    marginTop: 5,
-    width: "10%",
-    alignSelf: "flex-start",
+  icon: {
+    backgroundColor: "#999999",
+    padding: 15,
+    borderTopLeftRadius: 5,
+    borderBottomLeftRadius: 5,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    padding: 10,
+  },
+  listItem: {
+    marginHorizontal: 10,
+    marginVertical: 5,
+    backgroundColor: "#F3F0F0",
+    padding: 10,
+    borderRadius: 5,
+  },
+  listText: {
+    fontWeight: "bold",
+    fontSize: 18,
   },
 })
 

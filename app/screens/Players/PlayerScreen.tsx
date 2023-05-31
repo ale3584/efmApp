@@ -66,6 +66,20 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
       })
     }, [navigation])
 
+    const PlayerImage = ({ item }) => {
+      const [hasError, setHasError] = useState(false)
+
+      const handleError = () => {
+        setHasError(true)
+      }
+
+      const imageUrl = hasError
+        ? "https://www.efootballdb.com/img/players/player_noface.png"
+        : `https://api.efootballdb.com/assets/2022/players/${item.id}_.png`
+
+      return <Image style={styles.image} source={{ uri: imageUrl }} onError={handleError} />
+    }
+
     const handleEndReached = async () => {
       if (!IsEndReached) {
         await playerStore.setIsEndReached(true)
@@ -111,13 +125,7 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
           <View style={[StyleSheet.absoluteFillObject, styles.absoluteFill]}>
             <Text style={styles.name}>{item.name}</Text>
             <Text>{item.overall}</Text>
-            <Image
-              // animation="fadeIn"
-              style={styles.image}
-              source={{
-                uri: "https://api.efootballdb.com/assets/2022/players/7511_.png",
-              }}
-            />
+            <PlayerImage item={item} />
           </View>
         </View>
       </TouchableOpacity>

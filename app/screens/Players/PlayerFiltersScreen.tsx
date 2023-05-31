@@ -1,27 +1,34 @@
-import { Button, View, Text, SafeAreaView, TextInput } from "react-native"
+import { View, SafeAreaView, TextInput } from "react-native"
 import styles from "../styles/login"
 import { AntDesign } from "@expo/vector-icons"
-import { TextField, TextFieldAccessoryProps } from "app/components"
+import { Button, Text, TextFieldAccessoryProps } from "app/components"
+import { Icon } from "react-native-vector-icons/Icon"
+import { useState } from "react"
 
 export const FiltersScreen = ({ closeModal }) => {
-  const PasswordRightAccessory = function PasswordRightAccessory(props: TextFieldAccessoryProps) {
-    return <AntDesign name="search1" size={30} color="black" style={styles.search_icon} />
-  }
-
+  const [search, setSearch] = useState(null)
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ backgroundColor: "#FFFFFF", paddingTop: 10 }}>
-        <TextField
-          LeftAccessory={PasswordRightAccessory}
-          //containerStyle={styles.search_input}
-          inputWrapperStyle={styles.search_input}
-        />
+        <View style={styles.search}>
+          <View style={styles.icon}>
+            <AntDesign name="search1" size={20} color="#FFFFFF" />
+          </View>
+          <TextInput
+            style={styles.input}
+            placeholder="Search..."
+            onChangeText={(val) => setSearch(val)}
+          />
+        </View>
         <Text>Filters</Text>
         <TextInput style={{ height: 40, borderColor: "gray", borderWidth: 1 }} placeholder="Name" />
         <TextInput style={{ height: 40, borderColor: "gray", borderWidth: 1 }} placeholder="Age" />
-        <Button title="Apply" onPress={closeModal} />
-        <View style={{ height: 10 }} />
-        <Button title="Close" onPress={closeModal} />
+        <Button style={styles.button} onPress={closeModal}>
+          <Text text="Apply" style={styles.buttonText} />
+        </Button>
+        <Button style={styles.button} onPress={closeModal}>
+          <Text text="Close" style={styles.buttonText} />
+        </Button>
       </View>
     </SafeAreaView>
   )
