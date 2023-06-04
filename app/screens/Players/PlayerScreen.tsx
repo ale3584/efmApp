@@ -13,7 +13,6 @@ import {
   View,
   ViewStyle,
 } from "react-native"
-import Modal from "react-native-modal"
 import { StackScreenProps } from "@react-navigation/stack"
 import { AppStackScreenProps } from "app/navigators"
 import { Text } from "app/components"
@@ -35,6 +34,7 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
     const { navigation } = _props
     const [modalVisible, setModalVisible] = useState(false)
     const [page, setPage] = useState(0)
+    const [search, setSearch] = useState(null)
     const {
       playerStore,
       playerStore: { IsEndReached, IsLoading },
@@ -55,16 +55,6 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
     }, [])
 
     const Drawer = createDrawerNavigator()
-
-    useEffect(() => {
-      navigation.setOptions({
-        headerRight: () => (
-          <TouchableOpacity style={{ marginRight: 15 }} onPress={() => setModalVisible(true)}>
-            <AntDesign name="filter" size={24} color="black" />
-          </TouchableOpacity>
-        ),
-      })
-    }, [navigation])
 
     const PlayerImage = ({ item }) => {
       const [hasError, setHasError] = useState(false)
@@ -133,6 +123,21 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
 
     return (
       <View style={$root}>
+        <View style={styles.search}>
+          <View style={styles.icon}>
+            <AntDesign name="search1" size={20} />
+          </View>
+          <TextInput
+            style={styles.input}
+            placeholder="Search..."
+            onChangeText={(val) => setSearch(val)}
+          />
+          <TouchableOpacity onPress={() => setModalVisible(true)}>
+            <View style={styles.icon}>
+              <AntDesign name="filter" size={20} />
+            </View>
+          </TouchableOpacity>
+        </View>
         <View style={{ flex: 1 }}>
           <FlatList
             onEndReached={!IsEndReached && handleEndReached}
@@ -144,14 +149,10 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
             ListFooterComponent={renderFooter(IsLoading)}
             onEndReachedThreshold={0}
           />
-          <Modal
-            animationIn="slideInRight"
-            animationOut="slideOutRight"
-            isVisible={modalVisible}
-            style={{ margin: 0 }}
-          >
-            <FiltersScreen closeModal={() => setModalVisible(false)} />
-          </Modal>
+
+          {modalVisible && (
+            <FiltersScreen modalVisible={modalVisible} closeModal={() => setModalVisible(false)} />
+          )}
           {/* <View style={styles.bg} /> */}
         </View>
       </View>
@@ -183,5 +184,23 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 20,
     fontWeight: "700",
+  },
+  search: {
+    backgroundColor: "#EBE9E9",
+    margin: 10,
+    borderRadius: 5,
+    flexDirection: "row",
+  },
+  icon: {
+    //backgroundColor: "#999999",
+    color: "#999999",
+    padding: 15,
+    borderTopLeftRadius: 5,
+    borderBottomLeftRadius: 5,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    padding: 10,
   },
 })
