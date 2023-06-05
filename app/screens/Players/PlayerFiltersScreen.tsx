@@ -9,15 +9,24 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native"
-import { useEffect, useRef, useState } from "react"
-import { colors, typography } from "app/theme"
+import React, { useEffect, useRef, useState } from "react"
+import { FONTS, colors, typography } from "app/theme"
 import { AntDesign } from "@expo/vector-icons"
+import { TwoPointsSlider } from "app/components"
+import { Divider, List } from "react-native-paper"
+import { useStores } from "app/models"
 
 const { height } = Dimensions.get("window")
 
 export const FiltersScreen = ({ modalVisible, closeModal }) => {
   const modalAnimatedValue = useRef(new Animated.Value(0)).current
   const [showFilterModal, setShowFilterModal] = useState(modalVisible)
+  const [basicExpanded, setbasicExpanded] = useState(true)
+  const [positionExpanded, setpositionExpanded] = useState(false)
+  const [abilityExpanded, setabilityExpanded] = useState(false)
+  const [styleExpanded, setstyleExpanded] = useState(false)
+  const [skillExpanded, setskillExpanded] = useState(false)
+  const { playerFilters } = useStores()
 
   useEffect(() => {
     if (showFilterModal) {
@@ -39,6 +48,90 @@ export const FiltersScreen = ({ modalVisible, closeModal }) => {
     inputRange: [0, 1],
     outputRange: [height, height * 0.2],
   })
+
+  const Section = ({ containerStyle = {}, title, children }) => {
+    return (
+      <View
+        style={{
+          marginTop: 10,
+          marginBottom: 15,
+          ...containerStyle,
+        }}
+      >
+        <Text
+          style={{
+            ...FONTS.h3,
+          }}
+        >
+          {title}
+        </Text>
+        {children}
+      </View>
+    )
+  }
+
+  function renderAge() {
+    return (
+      <Section title={"Age"}>
+        <View
+          style={{
+            alignItems: "center",
+            flex: 1,
+          }}
+        >
+          <TwoPointsSlider
+            values={[18, 45]}
+            min={15}
+            max={50}
+            onValuesChange={(values) => console.log(values)}
+          />
+        </View>
+      </Section>
+    )
+  }
+
+  function renderHeight() {
+    return (
+      <Section title={"Height"}>
+        <View
+          style={{
+            alignItems: "center",
+          }}
+        >
+          <TwoPointsSlider
+            values={[130, 210]}
+            min={100}
+            max={227}
+            onValuesChange={(values) => console.log(values)}
+          />
+        </View>
+      </Section>
+    )
+  }
+  function renderWeight() {
+    return (
+      <Section title={"Weight"}>
+        <View
+          style={{
+            alignItems: "center",
+          }}
+        >
+          <TwoPointsSlider
+            values={[40, 120]}
+            min={30}
+            max={157}
+            onValuesChange={(values) => console.log(values)}
+          />
+        </View>
+      </Section>
+    )
+  }
+
+  const handlePressBasic = () => setbasicExpanded(!basicExpanded)
+  const handlePressPosition = () => setpositionExpanded(!positionExpanded)
+  const handlePressAbility = () => setabilityExpanded(!abilityExpanded)
+  const handlePressStyle = () => setstyleExpanded(!styleExpanded)
+  const handlePressSkill = () => setskillExpanded(!skillExpanded)
 
   return (
     <Modal animationType="fade" transparent={true} visible={modalVisible}>
@@ -98,24 +191,84 @@ export const FiltersScreen = ({ modalVisible, closeModal }) => {
             contentContainerStyle={{
               paddingBottom: 250,
             }}
-          ></ScrollView>
+          >
+            <Divider style={{ marginTop: 10, marginBottom: 10 }} />
+            <List.Accordion
+              title="Basic Settings"
+              expanded={basicExpanded}
+              onPress={handlePressBasic}
+              right={(props) =>
+                basicExpanded ? (
+                  <AntDesign name="up" size={20} />
+                ) : (
+                  <AntDesign name="right" size={20} />
+                )
+              }
+            >
+              {renderAge()}
+              {renderHeight()}
+              {renderWeight()}
+            </List.Accordion>
+            <List.Accordion
+              title="Position Settings"
+              expanded={positionExpanded}
+              onPress={handlePressPosition}
+              right={(props) =>
+                positionExpanded ? (
+                  <AntDesign name="up" size={20} />
+                ) : (
+                  <AntDesign name="right" size={20} />
+                )
+              }
+            >
+              <Text></Text>
+            </List.Accordion>
+            <List.Accordion
+              title="Ability Settings"
+              expanded={abilityExpanded}
+              onPress={handlePressAbility}
+              right={(props) =>
+                abilityExpanded ? (
+                  <AntDesign name="up" size={20} />
+                ) : (
+                  <AntDesign name="right" size={20} />
+                )
+              }
+            >
+              <Text></Text>
+            </List.Accordion>
+            <List.Accordion
+              title="Style Settings"
+              expanded={styleExpanded}
+              onPress={handlePressStyle}
+              right={(props) =>
+                styleExpanded ? (
+                  <AntDesign name="up" size={20} />
+                ) : (
+                  <AntDesign name="right" size={20} />
+                )
+              }
+            >
+              <Text></Text>
+            </List.Accordion>
+            <List.Accordion
+              title="Skill Settings"
+              expanded={skillExpanded}
+              onPress={handlePressSkill}
+              right={(props) =>
+                skillExpanded ? (
+                  <AntDesign name="up" size={20} />
+                ) : (
+                  <AntDesign name="right" size={20} />
+                )
+              }
+            >
+              <Text></Text>
+            </List.Accordion>
+          </ScrollView>
         </Animated.View>
       </View>
     </Modal>
-
-    /*<SafeAreaView style={{ flex: 1 }}>
-      <View style={{ backgroundColor: "#FFFFFF", paddingTop: 10 }}>
-        <Text>Filters</Text>
-        <TextInput style={{ height: 40, borderColor: "gray", borderWidth: 1 }} placeholder="Name" />
-        <TextInput style={{ height: 40, borderColor: "gray", borderWidth: 1 }} placeholder="Age" />
-        <Button style={styles.button} onPress={closeModal}>
-          <Text text="Apply" style={styles.buttonText} />
-        </Button>
-        <Button style={styles.button} onPress={closeModal}>
-          <Text text="Close" style={styles.buttonText} />
-        </Button>
-      </View>
-    </SafeAreaView>*/
   )
 }
 
