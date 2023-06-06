@@ -17,7 +17,7 @@ const TOP_HEADER_HEIGHT = height * 0.3
 // @ts-ignore
 export const PlayerDetailsScreen: FC<PlayerDetailsScreenProps> = observer(
   function PlayerDetailsScreen({ navigation, route }) {
-    const { item } = route.params
+    const { item }: any = route.params
     const [isloading, setIsloading] = useState(false)
     const [hasError, setHasError] = useState(false)
     const { playerStore } = useStores()

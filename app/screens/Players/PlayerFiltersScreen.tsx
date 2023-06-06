@@ -9,16 +9,25 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native"
+import { Picker } from "@react-native-picker/picker"
 import React, { useEffect, useRef, useState } from "react"
 import { FONTS, colors, typography } from "app/theme"
 import { AntDesign } from "@expo/vector-icons"
 import { TwoPointsSlider } from "app/components"
 import { Divider, List } from "react-native-paper"
+import { Checkbox } from "native-base"
+import { PlayerFiltersPosition, PlayerFiltersPStyle } from "app/models/PlayerFilters"
 import { useStores } from "app/models"
+import { observer } from "mobx-react-lite"
 
 const { height } = Dimensions.get("window")
 
-export const FiltersScreen = ({ modalVisible, closeModal }) => {
+interface FiltersScreenProps {
+  modalVisible: boolean
+  closeModal: () => void
+}
+
+export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScreenProps) => {
   const modalAnimatedValue = useRef(new Animated.Value(0)).current
   const [showFilterModal, setShowFilterModal] = useState(modalVisible)
   const [basicExpanded, setbasicExpanded] = useState(true)
@@ -221,7 +230,39 @@ export const FiltersScreen = ({ modalVisible, closeModal }) => {
                 )
               }
             >
-              <Text></Text>
+              {Object.keys(PlayerFiltersPosition).map((key) => {
+                if (playerFilters.playedPositions[key.toLowerCase()]) {
+                  return (
+                    <View key={key.toLowerCase()}>
+                      <Checkbox
+                        isChecked={playerFilters.playedPositions[key.toLowerCase()].selected}
+                        value="check"
+                        accessibilityLabel="This is CheckBox"
+                        onChange={() => playerFilters.playedPositions[key.toLowerCase()].toggle()}
+                      />
+                      <Picker
+                        style={{ flex: 1 }}
+                        selectedValue={playerFilters.playedPositions[key.toLowerCase()].min}
+                        onValueChange={(itemValue) => console.log({ itemValue })}
+                      >
+                        <Picker.Item label="A" value="A" />
+                        <Picker.Item label="B" value="B" />
+                        <Picker.Item label="C" value="C" />
+                      </Picker>
+                      <Picker
+                        style={{ flex: 1 }}
+                        selectedValue={playerFilters.playedPositions[key.toLowerCase()].max}
+                        onValueChange={(itemValue) => console.log({ itemValue })}
+                      >
+                        <Picker.Item label="A" value="A" />
+                        <Picker.Item label="B" value="B" />
+                        <Picker.Item label="C" value="C" />
+                      </Picker>
+                    </View>
+                  )
+                }
+                return null
+              })}
             </List.Accordion>
             <List.Accordion
               title="Ability Settings"
@@ -270,7 +311,7 @@ export const FiltersScreen = ({ modalVisible, closeModal }) => {
       </View>
     </Modal>
   )
-}
+})
 
 const styles = StyleSheet.create({
   icon: {

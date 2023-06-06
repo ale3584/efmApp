@@ -1,10 +1,32 @@
 import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree"
 import { withSetPropAction } from "./helpers/withSetPropAction"
 
-const PositionModel = types.model("Position", {
-  selected: types.boolean,
-  min: types.string,
-  max: types.string,
+const PositionModel = types
+  .model("Position", {
+    selected: types.boolean,
+    min: types.string,
+    max: types.string,
+  })
+  .actions((self) => ({
+    toggle() {
+      self.selected = !self.selected
+    },
+  })) // eslint-disable-line @typescript-eslint/no-unused-vars
+
+const PlayerPositionModel = types.model("PlayerPosition", {
+  gk: PositionModel,
+  cb: PositionModel,
+  lb: PositionModel,
+  rb: PositionModel,
+  dmf: PositionModel,
+  cmf: PositionModel,
+  lmf: PositionModel,
+  rmf: PositionModel,
+  amf: PositionModel,
+  lwf: PositionModel,
+  rwf: PositionModel,
+  ss: PositionModel,
+  cf: PositionModel,
 })
 
 const PositionRatingModel = types.model("PositionRating", {
@@ -13,23 +35,104 @@ const PositionRatingModel = types.model("PositionRating", {
   max: types.number,
 })
 
+const PlayerPositionRatingModel = types.model("PlayerPositionRating", {
+  overallGK: PositionRatingModel,
+  overallCB: PositionRatingModel,
+  overallLB: PositionRatingModel,
+  overallRB: PositionRatingModel,
+  overallDMF: PositionRatingModel,
+  overallCMF: PositionRatingModel,
+  overallLMF: PositionRatingModel,
+  overallRMF: PositionRatingModel,
+  overallAMF: PositionRatingModel,
+  overallLWF: PositionRatingModel,
+  overallRWF: PositionRatingModel,
+  overallSS: PositionRatingModel,
+  overallCF: PositionRatingModel,
+})
+
 const TeamPlayStyleModel = types.model("TeamPlayStyle", {
   selected: types.boolean,
   min: types.number,
   max: types.number,
 })
 
+const PlayerTeamPlayStyleModel = types.model("PlayerTeamPlayStyle", {
+  possessiongame: TeamPlayStyleModel,
+  quickcounter: TeamPlayStyleModel,
+  longballcounter: TeamPlayStyleModel,
+  outwide: TeamPlayStyleModel,
+  longball: TeamPlayStyleModel,
+})
+
+const SkillsModel = types.model("Skills", {
+  selected: types.boolean,
+  value: types.number,
+})
+
 const PlayerSkillsModel = types.model("PlayerSkills", {
+  scissorsfeint: SkillsModel,
+  doubletouch: SkillsModel,
+  flipflap: SkillsModel,
+  marseilleturn: SkillsModel,
+  sombrero: SkillsModel,
+  crossoverturn: SkillsModel,
+  cutbehindturn: SkillsModel,
+  scotchmove: SkillsModel,
+  steponskillcontrol: SkillsModel,
+  sheading: SkillsModel,
+  longrangedrive: SkillsModel,
+  chipshotcontrol: SkillsModel,
+  longrangeshooting: SkillsModel,
+  knuckleshot: SkillsModel,
+  dippingshot: SkillsModel,
+  risingshots: SkillsModel,
+  acrobaticfinishing: SkillsModel,
+  helltrick: SkillsModel,
+  firsttimeshot: SkillsModel,
+  onetouchpass: SkillsModel,
+  throughpassing: SkillsModel,
+  weightedpass: SkillsModel,
+  pinpointcrossing: SkillsModel,
+  outsidecurler: SkillsModel,
+  rabona: SkillsModel,
+  nolookpass: SkillsModel,
+  lowloftedpass: SkillsModel,
+  gklowpunt: SkillsModel,
+  gkhighpunt: SkillsModel,
+  longthrow: SkillsModel,
+  gklongthrow: SkillsModel,
+  penaltyspecialist: SkillsModel,
+  gkpenaltysaver: SkillsModel,
+  gamesmanship: SkillsModel,
+  manmarking: SkillsModel,
+  trackback: SkillsModel,
+  captaincy: SkillsModel,
+  interception: SkillsModel,
+  acrobaticclear: SkillsModel,
+  supersub: SkillsModel,
+  fightingspirit: SkillsModel,
+  blocker: SkillsModel,
+  aerialsuperiority: SkillsModel,
+  slidingtackle: SkillsModel,
+})
+
+const StylesAIModel = types.model("StylesAI", {
   selected: types.boolean,
   value: types.number,
 })
 
 const PlayerStylesAIModel = types.model("PlayerStylesAI", {
-  selected: types.boolean,
-  value: types.number,
+  trickster: StylesAIModel,
+  mazingrun: StylesAIModel,
+  speedingbullet: StylesAIModel,
+  incisiverun: StylesAIModel,
+  longballexpert: StylesAIModel,
+  earlycross: StylesAIModel,
+  longrange: StylesAIModel,
 })
 
-const PlayerAbilityModel = types.model("PlayerAbility", {
+const AbilityModel = types.model("PlayerAbility", {
   selected: types.boolean,
   min: types.number,
   max: types.number,
@@ -59,6 +162,40 @@ const PlayerOverallModel = types.model("PlayerOverall", {
   selected: types.boolean,
   min: types.number,
   max: types.number,
+})
+const PlayerAbilityModel = types.model("PlayerAbility", {
+  offensiveawareness: AbilityModel,
+  ballcontrol: AbilityModel,
+  dribbling: AbilityModel,
+  tightpossession: AbilityModel,
+  lowpass: AbilityModel,
+  loftedpass: AbilityModel,
+  finishing: AbilityModel,
+  heading: AbilityModel,
+  placekicking: AbilityModel,
+  curl: AbilityModel,
+  speed: AbilityModel,
+  acceleration: AbilityModel,
+  kickingpower: AbilityModel,
+  jump: AbilityModel,
+  physicalcontact: AbilityModel,
+  stamina: AbilityModel,
+  defensiveawareness: AbilityModel,
+  ballwinning: AbilityModel,
+  defensiveengagement: AbilityModel,
+  aggression: AbilityModel,
+  gkawareness: AbilityModel,
+  gkcatching: AbilityModel,
+  gkclearing: AbilityModel,
+  gkreflexes: AbilityModel,
+  gkreach: AbilityModel,
+  weakfootusage: AbilityModel,
+  weakfootaccuracy: AbilityModel,
+  form: AbilityModel,
+  injuryresistance: AbilityModel,
+  reputation: AbilityModel,
+  playingattitude: AbilityModel,
+  balance: AbilityModel,
 })
 
 export enum PlayerFiltersPosition {
@@ -131,138 +268,22 @@ export const PlayerFiltersPStyleToString = [
 
 export const PlayerFiltersModel = types
   .model("PlayerFilters", {
-    playedPositions: types.model({
-      gk: PositionModel,
-      cb: PositionModel,
-      lb: PositionModel,
-      rb: PositionModel,
-      dmf: PositionModel,
-      cmf: PositionModel,
-      lmf: PositionModel,
-      rmf: PositionModel,
-      amf: PositionModel,
-      lwf: PositionModel,
-      rwf: PositionModel,
-      ss: PositionModel,
-      cf: PositionModel,
-    }),
-    playedPositionsRating: types.model({
-      overallGK: PositionRatingModel,
-      overallCB: PositionRatingModel,
-      overallLB: PositionRatingModel,
-      overallRB: PositionRatingModel,
-      overallDMF: PositionRatingModel,
-      overallCMF: PositionRatingModel,
-      overallLMF: PositionRatingModel,
-      overallRMF: PositionRatingModel,
-      overallAMF: PositionRatingModel,
-      overallLWF: PositionRatingModel,
-      overallRWF: PositionRatingModel,
-      overallSS: PositionRatingModel,
-      overallCF: PositionRatingModel,
-    }),
-    teamPlayStyle: types.model({
-      possessiongame: TeamPlayStyleModel,
-      quickcounter: TeamPlayStyleModel,
-      longballcounter: TeamPlayStyleModel,
-      outwide: TeamPlayStyleModel,
-      longball: TeamPlayStyleModel,
-    }),
-    playerSkills: types.model({
-      scissorsfeint: PlayerSkillsModel,
-      doubletouch: PlayerSkillsModel,
-      flipflap: PlayerSkillsModel,
-      marseilleturn: PlayerSkillsModel,
-      sombrero: PlayerSkillsModel,
-      crossoverturn: PlayerSkillsModel,
-      cutbehindturn: PlayerSkillsModel,
-      scotchmove: PlayerSkillsModel,
-      steponskillcontrol: PlayerSkillsModel,
-      sheading: PlayerSkillsModel,
-      longrangedrive: PlayerSkillsModel,
-      chipshotcontrol: PlayerSkillsModel,
-      longrangeshooting: PlayerSkillsModel,
-      knuckleshot: PlayerSkillsModel,
-      dippingshot: PlayerSkillsModel,
-      risingshots: PlayerSkillsModel,
-      acrobaticfinishing: PlayerSkillsModel,
-      helltrick: PlayerSkillsModel,
-      firsttimeshot: PlayerSkillsModel,
-      onetouchpass: PlayerSkillsModel,
-      throughpassing: PlayerSkillsModel,
-      weightedpass: PlayerSkillsModel,
-      pinpointcrossing: PlayerSkillsModel,
-      outsidecurler: PlayerSkillsModel,
-      rabona: PlayerSkillsModel,
-      nolookpass: PlayerSkillsModel,
-      lowloftedpass: PlayerSkillsModel,
-      gklowpunt: PlayerSkillsModel,
-      gkhighpunt: PlayerSkillsModel,
-      longthrow: PlayerSkillsModel,
-      gklongthrow: PlayerSkillsModel,
-      penaltyspecialist: PlayerSkillsModel,
-      gkpenaltysaver: PlayerSkillsModel,
-      gamesmanship: PlayerSkillsModel,
-      manmarking: PlayerSkillsModel,
-      trackback: PlayerSkillsModel,
-      captaincy: PlayerSkillsModel,
-      interception: PlayerSkillsModel,
-      acrobaticclear: PlayerSkillsModel,
-      supersub: PlayerSkillsModel,
-      fightingspirit: PlayerSkillsModel,
-      blocker: PlayerSkillsModel,
-      aerialsuperiority: PlayerSkillsModel,
-      slidingtackle: PlayerSkillsModel,
-    }),
-    playerStylesAI: types.model({
-      trickster: PlayerStylesAIModel,
-      mazingrun: PlayerStylesAIModel,
-      speedingbullet: PlayerStylesAIModel,
-      incisiverun: PlayerStylesAIModel,
-      longballexpert: PlayerStylesAIModel,
-      earlycross: PlayerStylesAIModel,
-      longrange: PlayerStylesAIModel,
-    }),
-    playerAbility: types.model({
-      offensiveawareness: PlayerAbilityModel,
-      ballcontrol: PlayerAbilityModel,
-      dribbling: PlayerAbilityModel,
-      tightpossession: PlayerAbilityModel,
-      lowpass: PlayerAbilityModel,
-      loftedpass: PlayerAbilityModel,
-      finishing: PlayerAbilityModel,
-      heading: PlayerAbilityModel,
-      placekicking: PlayerAbilityModel,
-      curl: PlayerAbilityModel,
-      speed: PlayerAbilityModel,
-      acceleration: PlayerAbilityModel,
-      kickingpower: PlayerAbilityModel,
-      jump: PlayerAbilityModel,
-      physicalcontact: PlayerAbilityModel,
-      stamina: PlayerAbilityModel,
-      defensiveawareness: PlayerAbilityModel,
-      ballwinning: PlayerAbilityModel,
-      defensiveengagement: PlayerAbilityModel,
-      aggression: PlayerAbilityModel,
-      gkawareness: PlayerAbilityModel,
-      gkcatching: PlayerAbilityModel,
-      gkclearing: PlayerAbilityModel,
-      gkreflexes: PlayerAbilityModel,
-      gkreach: PlayerAbilityModel,
-      weakfootusage: PlayerAbilityModel,
-      weakfootaccuracy: PlayerAbilityModel,
-      form: PlayerAbilityModel,
-      injuryresistance: PlayerAbilityModel,
-      reputation: PlayerAbilityModel,
-      playingattitude: PlayerAbilityModel,
-      balance: PlayerAbilityModel,
-    }),
+    playedPositions: PlayerPositionModel,
+    playedPositionsRating: PlayerPositionRatingModel,
+    teamPlayStyle: PlayerTeamPlayStyleModel,
+    playerSkills: PlayerSkillsModel,
+    playerStylesAI: PlayerStylesAIModel,
+    playerAbility: PlayerAbilityModel,
     name: types.optional(types.string, ""),
     overall: PlayerOverallModel,
     playerBasicInfo: PlayerBasicInfoModel,
   })
   .actions(withSetPropAction)
-  .views((self) => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
+  .views((self) => ({
+    get PlayedPositions() {
+      return self.playedPositions
+    },
+  })) // eslint-disable-line @typescript-eslint/no-unused-vars
   .actions((self) => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
 
 export interface PlayerFilters extends Instance<typeof PlayerFiltersModel> {}

@@ -3,7 +3,7 @@ import { AuthenticationStoreModel } from "./AuthenticationStore" // @demo remove
 import { AuthStoreModel } from "./AuthStore"
 import { PlayerStoreModel } from "./PlayerStore"
 import { PlayerModel } from "./Player"
-import { PlayerFilters, PlayerFiltersModel } from "./PlayerFilters"
+import { PlayerFiltersModel } from "./PlayerFilters"
 
 /**
  * A RootStore model.
