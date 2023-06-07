@@ -15,7 +15,7 @@ import { FONTS, colors, typography } from "app/theme"
 import { AntDesign } from "@expo/vector-icons"
 import { TwoPointsSlider } from "app/components"
 import { Divider, List } from "react-native-paper"
-import { Checkbox } from "native-base"
+import { Checkbox, Select, Box, Center } from "native-base"
 import { PlayerFiltersPosition, PlayerFiltersPStyle } from "app/models/PlayerFilters"
 import { useStores } from "app/models"
 import { observer } from "mobx-react-lite"
@@ -229,35 +229,59 @@ export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScre
                   <AntDesign name="right" size={20} />
                 )
               }
+              style={{ marginBottom: 10 }}
             >
               {Object.keys(PlayerFiltersPosition).map((key) => {
                 if (playerFilters.playedPositions[key.toLowerCase()]) {
                   return (
                     <View key={key.toLowerCase()}>
-                      <Checkbox
-                        isChecked={playerFilters.playedPositions[key.toLowerCase()].selected}
-                        value="check"
-                        accessibilityLabel="This is CheckBox"
-                        onChange={() => playerFilters.playedPositions[key.toLowerCase()].toggle()}
-                      />
-                      <Picker
-                        style={{ flex: 1 }}
-                        selectedValue={playerFilters.playedPositions[key.toLowerCase()].min}
-                        onValueChange={(itemValue) => console.log({ itemValue })}
+                      <Box
+                        alignSelf="center"
+                        alignItems={"center"}
+                        alignContent={"center"}
+                        style={{ flex: 1, flexDirection: "row", marginBottom: 10 }}
                       >
-                        <Picker.Item label="A" value="A" />
-                        <Picker.Item label="B" value="B" />
-                        <Picker.Item label="C" value="C" />
-                      </Picker>
-                      <Picker
-                        style={{ flex: 1 }}
-                        selectedValue={playerFilters.playedPositions[key.toLowerCase()].max}
-                        onValueChange={(itemValue) => console.log({ itemValue })}
-                      >
-                        <Picker.Item label="A" value="A" />
-                        <Picker.Item label="B" value="B" />
-                        <Picker.Item label="C" value="C" />
-                      </Picker>
+                        <Center
+                          style={{ flex: 4, flexDirection: "row" }}
+                          alignItems={"center"}
+                          alignSelf={"center"}
+                        >
+                          <Box>
+                            <Checkbox
+                              isChecked={playerFilters.playedPositions[key.toLowerCase()].selected}
+                              value="check"
+                              accessibilityLabel="This is CheckBox"
+                              onChange={() =>
+                                playerFilters.playedPositions[key.toLowerCase()].toggle()
+                              }
+                              style={{ margin: 10 }}
+                            />
+                          </Box>
+                          <Box style={{ width: 30, marginLeft: 5, marginRight: 5 }}>{key}</Box>
+
+                          <Select
+                            selectedValue={playerFilters.playedPositions[key.toLowerCase()].min}
+                            accessibilityLabel="Choose Rating"
+                            placeholder="Choose Rating"
+                            onValueChange={(itemValue) => console.log({ itemValue })}
+                            width={100}
+                          >
+                            <Select.Item label="A" value="A" />
+                            <Select.Item label="B" value="B" />
+                            <Select.Item label="C" value="C" />
+                          </Select>
+                          <Select
+                            selectedValue={playerFilters.playedPositions[key.toLowerCase()].max}
+                            onValueChange={(itemValue) => console.log({ itemValue })}
+                            width={100}
+                            marginLeft={5}
+                          >
+                            <Select.Item label="A" value="A" />
+                            <Select.Item label="B" value="B" />
+                            <Select.Item label="C" value="C" />
+                          </Select>
+                        </Center>
+                      </Box>
                     </View>
                   )
                 }
