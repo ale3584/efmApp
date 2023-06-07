@@ -9,14 +9,18 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native"
-import { Picker } from "@react-native-picker/picker"
 import React, { useEffect, useRef, useState } from "react"
 import { FONTS, colors, typography } from "app/theme"
 import { AntDesign } from "@expo/vector-icons"
 import { TwoPointsSlider } from "app/components"
-import { Divider, List } from "react-native-paper"
+import { Divider, List, Chip } from "react-native-paper"
 import { Checkbox, Select, Box, Center } from "native-base"
-import { PlayerFiltersPosition, PlayerFiltersPStyle } from "app/models/PlayerFilters"
+import {
+  PlayerAbility,
+  PlayerFiltersPosition,
+  PlayerFiltersPStyle,
+  PlayerPositionRating,
+} from "app/models/PlayerFilters"
 import { useStores } from "app/models"
 import { observer } from "mobx-react-lite"
 
@@ -30,7 +34,7 @@ interface FiltersScreenProps {
 export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScreenProps) => {
   const modalAnimatedValue = useRef(new Animated.Value(0)).current
   const [showFilterModal, setShowFilterModal] = useState(modalVisible)
-  const [basicExpanded, setbasicExpanded] = useState(true)
+  const [basicExpanded, setbasicExpanded] = useState(false)
   const [positionExpanded, setpositionExpanded] = useState(false)
   const [abilityExpanded, setabilityExpanded] = useState(false)
   const [styleExpanded, setstyleExpanded] = useState(false)
@@ -263,7 +267,9 @@ export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScre
                             selectedValue={playerFilters.playedPositions[key.toLowerCase()].min}
                             accessibilityLabel="Choose Rating"
                             placeholder="Choose Rating"
-                            onValueChange={(itemValue) => console.log({ itemValue })}
+                            onValueChange={(itemValue) =>
+                              playerFilters.playedPositions[key.toLowerCase()].setMin(itemValue)
+                            }
                             width={100}
                           >
                             <Select.Item label="A" value="A" />
@@ -272,7 +278,9 @@ export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScre
                           </Select>
                           <Select
                             selectedValue={playerFilters.playedPositions[key.toLowerCase()].max}
-                            onValueChange={(itemValue) => console.log({ itemValue })}
+                            onValueChange={(itemValue) =>
+                              playerFilters.playedPositions[key.toLowerCase()].setMax(itemValue)
+                            }
                             width={100}
                             marginLeft={5}
                           >
@@ -289,10 +297,10 @@ export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScre
               })}
             </List.Accordion>
             <List.Accordion
-              title="Ability Settings"
+              title="Position Rating"
               expanded={abilityExpanded}
               onPress={handlePressAbility}
-              right={(props) =>
+              right={() =>
                 abilityExpanded ? (
                   <AntDesign name="up" size={20} />
                 ) : (
@@ -300,28 +308,74 @@ export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScre
                 )
               }
             >
-              <Text></Text>
+              {Object.keys(PlayerPositionRating).map((key) => {
+                return (
+                  <Section title={PlayerPositionRating[key]} key={key}>
+                    <View
+                      style={{
+                        alignItems: "center",
+                        flex: 1,
+                      }}
+                    >
+                      <TwoPointsSlider
+                        values={[
+                          playerFilters.playedPositionsRating[key].min,
+                          playerFilters.playedPositionsRating[key].max,
+                        ]}
+                        min={40}
+                        max={99}
+                        onValuesChange={(values) => {
+                          playerFilters.playedPositionsRating[key].setValues(values[0], values[1])
+                        }}
+                      />
+                    </View>
+                  </Section>
+                )
+              })}
             </List.Accordion>
             <List.Accordion
-              title="Style Settings"
-              expanded={styleExpanded}
-              onPress={handlePressStyle}
-              right={(props) =>
-                styleExpanded ? (
+              title="Ability Settings"
+              expanded={skillExpanded}
+              onPress={handlePressSkill}
+              right={() =>
+                skillExpanded ? (
                   <AntDesign name="up" size={20} />
                 ) : (
                   <AntDesign name="right" size={20} />
                 )
               }
             >
-              <Text></Text>
+              {Object.keys(PlayerAbility).map((key) => {
+                return (
+                  <Section title={PlayerAbility[key]} key={key}>
+                    <View
+                      style={{
+                        alignItems: "center",
+                        flex: 1,
+                      }}
+                    >
+                      <TwoPointsSlider
+                        values={[
+                          playerFilters.playerAbility[key].min,
+                          playerFilters.playerAbility[key].max,
+                        ]}
+                        min={playerFilters.playerAbility[key].defMin}
+                        max={playerFilters.playerAbility[key].defMax}
+                        onValuesChange={(values) => {
+                          playerFilters.playerAbility[key].setValues(values[0], values[1])
+                        }}
+                      />
+                    </View>
+                  </Section>
+                )
+              })}
             </List.Accordion>
             <List.Accordion
-              title="Skill Settings"
-              expanded={skillExpanded}
-              onPress={handlePressSkill}
-              right={(props) =>
-                skillExpanded ? (
+              title="Style Settings"
+              expanded={styleExpanded}
+              onPress={handlePressStyle}
+              right={() =>
+                styleExpanded ? (
                   <AntDesign name="up" size={20} />
                 ) : (
                   <AntDesign name="right" size={20} />

@@ -11,6 +11,14 @@ const PositionModel = types
     toggle() {
       self.selected = !self.selected
     },
+    setMin(value: string) {
+      self.min = value
+      self.selected = true
+    },
+    setMax(value: string) {
+      self.max = value
+      self.selected = true
+    },
   })) // eslint-disable-line @typescript-eslint/no-unused-vars
 
 const PlayerPositionModel = types.model("PlayerPosition", {
@@ -29,11 +37,22 @@ const PlayerPositionModel = types.model("PlayerPosition", {
   cf: PositionModel,
 })
 
-const PositionRatingModel = types.model("PositionRating", {
-  selected: types.boolean,
-  min: types.number,
-  max: types.number,
-})
+const PositionRatingModel = types
+  .model("PositionRating", {
+    selected: types.boolean,
+    min: types.number,
+    max: types.number,
+  })
+  .actions((self) => ({
+    toggle() {
+      self.selected = !self.selected
+    },
+    setValues(min: number, max: number) {
+      self.min = min
+      self.max = max
+      self.selected = true
+    },
+  })) // eslint-disable-line @typescript-eslint/no-unused-vars
 
 const PlayerPositionRatingModel = types.model("PlayerPositionRating", {
   overallGK: PositionRatingModel,
@@ -132,11 +151,24 @@ const PlayerStylesAIModel = types.model("PlayerStylesAI", {
   longrange: StylesAIModel,
 })
 
-const AbilityModel = types.model("PlayerAbility", {
-  selected: types.boolean,
-  min: types.number,
-  max: types.number,
-})
+const AbilityModel = types
+  .model("PlayerAbility", {
+    selected: types.boolean,
+    min: types.number,
+    max: types.number,
+    defMin: types.number,
+    defMax: types.number,
+  })
+  .actions((self) => ({
+    toggle() {
+      self.selected = !self.selected
+    },
+    setValues(min: number, max: number) {
+      self.min = min
+      self.max = max
+      self.selected = true
+    },
+  }))
 
 const PlayerBasicModel = types.model("PlayerBasic", {
   selected: types.boolean,
@@ -181,7 +213,6 @@ const PlayerAbilityModel = types.model("PlayerAbility", {
   physicalcontact: AbilityModel,
   stamina: AbilityModel,
   defensiveawareness: AbilityModel,
-  ballwinning: AbilityModel,
   defensiveengagement: AbilityModel,
   aggression: AbilityModel,
   gkawareness: AbilityModel,
@@ -193,9 +224,8 @@ const PlayerAbilityModel = types.model("PlayerAbility", {
   weakfootaccuracy: AbilityModel,
   form: AbilityModel,
   injuryresistance: AbilityModel,
-  reputation: AbilityModel,
-  playingattitude: AbilityModel,
   balance: AbilityModel,
+  tackling: AbilityModel,
 })
 
 export enum PlayerFiltersPosition {
@@ -238,6 +268,55 @@ export enum PlayerFiltersPStyle {
   Orchestrator = 20,
   FullBackFinisher = 21,
   TargetMan = 22,
+}
+
+export enum PlayerPositionRating {
+  overallGK = "GK",
+  overallCB = "CB",
+  overallLB = "LB",
+  overallRB = "RB",
+  overallDMF = "DMF",
+  overallCMF = "CMF",
+  overallLMF = "LMF",
+  overallRMF = "RMF",
+  overallAMF = "AMF",
+  overallLWF = "LWF",
+  overallRWF = "RWF",
+  overallSS = "SS",
+  overallCF = "CF",
+}
+
+export enum PlayerAbility {
+  offensiveawareness = "Off. Awareness",
+  ballcontrol = "Ball Control",
+  dribbling = "Dribbling",
+  tightpossession = "Tight Possession",
+  lowpass = "Low Pass",
+  loftedpass = "Lofted Pass",
+  finishing = "Finishing",
+  heading = "Heading",
+  placekicking = "Place Kicking",
+  curl = "Curl",
+  kickingpower = "Kicking Power",
+  defensiveawareness = "Def. Awareness",
+  defensiveengagement = "Def. Engagement",
+  tackling = "Tackling",
+  aggression = "Aggression",
+  gkawareness = "GK Awareness",
+  gkcatching = "GK Catching",
+  gkclearing = "GK Clearing",
+  gkreflexes = "GK Reflexes",
+  gkreach = "GK Reach",
+  speed = "Speed",
+  acceleration = "Acceleration",
+  jump = "Jump",
+  physicalcontact = "Physical Contact",
+  balance = "Balance",
+  stamina = "Stamina",
+  weakfootusage = "Weak Foot Usage",
+  weakfootaccuracy = "Weak Foot Accuracy",
+  form = "Form",
+  injuryresistance = "Injury Resistance",
 }
 
 export const PlayerFiltersPStyleToString = [
