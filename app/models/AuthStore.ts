@@ -2,14 +2,20 @@ import { Instance, SnapshotIn, SnapshotOut, flow, types } from "mobx-state-tree"
 import { withSetPropAction } from "./helpers/withSetPropAction"
 import { withStatus } from "../extensions/with-status"
 import { AuthenticationApi } from "../services/api/authApi"
-import { LoginFullResult, LogoutResult, RegisterResult, api, refreshTokenResult } from "../services/api"
+import {
+  LoginFullResult,
+  LogoutResult,
+  RegisterResult,
+  api,
+  refreshTokenResult,
+} from "../services/api"
 import jwtDecode from "jwt-decode"
 import * as storage from "../utils/storage"
 
 type DecodedToken = {
-    sub: string,
-    iat: number,
-    exp: number,
+  sub: string
+  iat: number
+  exp: number
 }
 /**
  * Model description here for TypeScript hints.
@@ -32,18 +38,17 @@ export const AuthStoreModel = types
     get validationError() {
       if (self.authEmail.length === 0) return "can't be blank"
       if (self.authEmail.length < 6) return "must be at least 6 characters"
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(self.authEmail))
-        return "must be a valid email address"
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(self.authEmail)) return "must be a valid email address"
       return ""
     },
-    get isError(){
+    get isError() {
       return self.error.length === 0
     },
   }))
   .actions(withSetPropAction)
   .actions((self) => ({
     setAuthenticated(value: boolean) {
-      self.isAuthenticated = value;
+      self.isAuthenticated = value
     },
     setAuthToken(value?: string) {
       self.authToken = value
@@ -59,146 +64,143 @@ export const AuthStoreModel = types
     setAuthUser(value: string) {
       self.authUser = value.replace(/ /g, "")
     },
-    setError(value?: string[]){
+    setError(value?: string[]) {
       self.error = undefined
-      self.error.push(...value);
-    }
+      self.error.push(...value)
+    },
   }))
   .actions((self) => ({
     login: flow(function* (emailAddress: string, password: string) {
-      self.setStatus("pending");
+      self.setStatus("pending")
 
-      const authenticationApi = new AuthenticationApi(api, self);
-      const result: LoginFullResult = yield authenticationApi.login(
-        emailAddress,
-        password
-      );
+      const authenticationApi = new AuthenticationApi(api, self)
+      const result: LoginFullResult = yield authenticationApi.login(emailAddress, password)
 
       if (result.kind === "ok") {
-        self.setStatus("done");
-        self.setAuthenticated(true);
-        self.setAuthToken(result.accessToken);
-        self.setRefreshToken(result.refreshToken);
+        self.setStatus("done")
+        self.setAuthenticated(true)
+        self.setAuthToken(result.accessToken)
+        self.setRefreshToken(result.refreshToken)
       } else {
-        self.setStatus("error");
-        self.setAuthenticated(false);
+        self.setStatus("error")
+        self.setAuthenticated(false)
         self.setError([`Error fetching players: ${JSON.stringify(result)}`])
-        __DEV__ && console.tron.log(result.kind);
+        __DEV__ && console.tron.log(result.kind)
       }
     }),
     signup: flow(function* (username: string, emailAddress: string, password: string) {
-      self.setStatus("pending");
+      self.setStatus("pending")
 
-      const authenticationApi = new AuthenticationApi(api, self);
+      const authenticationApi = new AuthenticationApi(api, self)
       const result: RegisterResult = yield authenticationApi.signup(
         username,
         emailAddress,
-        password
-      );
+        password,
+      )
 
       if (result.kind === "ok") {
-        self.setStatus("done");
-        
+        self.setStatus("done")
+
         // self.setAuthenticated(true);
         // self.setAuthToken(result.accessToken);
         // self.setRefreshToken(result.refreshToken);
       } else {
-        self.setStatus("error");
-        self.setAuthenticated(false);
+        self.setStatus("error")
+        self.setAuthenticated(false)
         self.setError(result.message)
-        __DEV__ && console.tron.log(result.kind);
+        __DEV__ && console.tron.log(result.kind)
       }
     }),
 
     logout: flow(function* () {
-      self.setStatus("pending");
+      self.setStatus("pending")
 
-      const authenticationApi = new AuthenticationApi(api, self);
-      const result: LogoutResult = yield authenticationApi.logout(self.refreshToken, self.authToken);
+      const authenticationApi = new AuthenticationApi(api, self)
+      const result: LogoutResult = yield authenticationApi.logout(self.refreshToken, self.authToken)
       if (result.kind === "ok") {
-        self.setStatus("done");
-        self.setAuthenticated(false);
-        self.setAuthToken("");
-        self.setRefreshToken("");
-        self.authEmail = "";
+        self.setStatus("done")
+        self.setAuthenticated(false)
+        self.setAuthToken("")
+        self.setRefreshToken("")
+        self.authEmail = ""
       } else {
-        self.setStatus("error");
-        self.setAuthenticated(false);
-        self.setAuthToken("");
-        self.setRefreshToken("");
-        __DEV__ && console.tron.log(result.kind);
+        self.setStatus("error")
+        self.setAuthenticated(false)
+        self.setAuthToken("")
+        self.setRefreshToken("")
+        __DEV__ && console.tron.log(result.kind)
       }
     }),
     refToken: flow(function* () {
-      self.setStatus("pending");
+      self.setStatus("pending")
 
-      const authenticationApi = new AuthenticationApi(api, self);
-      const result: refreshTokenResult = yield authenticationApi.refreshToken(self.refreshToken);
+      const authenticationApi = new AuthenticationApi(api, self)
+      const result: refreshTokenResult = yield authenticationApi.refreshToken(self.refreshToken)
 
       if (result.kind === "ok") {
-        self.setStatus("done");
-        self.setAuthenticated(true);
-        self.setAuthToken(result.accessToken);
-        self.setRefreshToken(result.refreshToken);
+        self.setStatus("done")
+        self.setAuthenticated(true)
+        self.setAuthToken(result.accessToken)
+        self.setRefreshToken(result.refreshToken)
       } else {
-        self.setStatus("error");
-        self.setAuthenticated(false);
-        self.authToken = "";
-        self.refreshToken = "";
-        self.authEmail = "";
-        __DEV__ && console.tron.log(result.kind);
+        self.setStatus("error")
+        self.setAuthenticated(false)
+        self.authToken = ""
+        self.refreshToken = ""
+        self.authEmail = ""
+        __DEV__ && console.tron.log(result.kind)
       }
     }),
-    
-  })).actions(self=> ({
+  }))
+  .actions((self) => ({
     checkToken: flow(function* () {
-      self.setStatus("pending");
-      if(self.authToken ===""){
-        return false;
-      } 
+      self.setStatus("pending")
+      if (self.authToken === "") {
+        return false
+      }
 
-      const decodedToken: DecodedToken = jwtDecode(self.authToken);
+      const decodedToken: DecodedToken = jwtDecode(self.authToken)
 
-      const expirationTime = decodedToken.exp;
-  
+      const expirationTime = decodedToken.exp
+
       if (expirationTime < new Date().getTime() / 1000) {
-        self.refToken();
-        const decodedToken: DecodedToken = jwtDecode(self.authToken);
+        self.refToken()
+        const decodedToken: DecodedToken = jwtDecode(self.authToken)
 
-        const expirationTime = decodedToken.exp;
+        const expirationTime = decodedToken.exp
         if (expirationTime < new Date().getTime() / 1000) {
-          return false;
-        }else{
-          return true;
+          return false
+        } else {
+          return true
         }
       } else {
-        return true;
+        return true
       }
     }),
   }))
   .views((self) => ({
     get isTokenValid() {
-      self.setStatus("pending");
-      if(self.authToken ===""){
-        return false;
-      } 
+      self.setStatus("pending")
+      if (self.authToken === "") {
+        return false
+      }
 
-      const decodedToken: DecodedToken = jwtDecode(self.authToken);
+      const decodedToken: DecodedToken = jwtDecode(self.authToken)
 
-      const expirationTime = decodedToken.exp;
-  
+      const expirationTime = decodedToken.exp
+
       if (expirationTime < new Date().getTime() / 1000) {
-        self.refToken();
-        const decodedToken: DecodedToken = jwtDecode(self.authToken);
+        self.refToken()
+        const decodedToken: DecodedToken = jwtDecode(self.authToken)
 
-        const expirationTime = decodedToken.exp;
+        const expirationTime = decodedToken.exp
         if (expirationTime < new Date().getTime() / 1000) {
-          return false;
-        }else{
-          return true;
+          return false
+        } else {
+          return true
         }
       } else {
-        return true;
+        return true
       }
     },
   }))
@@ -206,4 +208,12 @@ export const AuthStoreModel = types
 export interface AuthStore extends Instance<typeof AuthStoreModel> {}
 export interface AuthStoreSnapshotOut extends SnapshotOut<typeof AuthStoreModel> {}
 export interface AuthStoreSnapshotIn extends SnapshotIn<typeof AuthStoreModel> {}
-export const createAuthStoreDefaultModel = () => types.optional(AuthStoreModel, {})
+export const createAuthStoreDefaultModel = () =>
+  types.optional(AuthStoreModel, {
+    isAuthenticated: false,
+    authEmail: "",
+    authUser: "",
+    authToken: "",
+    refreshToken: "",
+    error: [],
+  })

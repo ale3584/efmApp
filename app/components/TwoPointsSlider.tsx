@@ -26,9 +26,9 @@ export const TwoPointsSlider = observer(function TwoPointsSlider(props: TwoPoint
 
   return (
     <MultiSlider
+      onValuesChangeFinish={() => onValuesChange}
       values={values}
       sliderLength={280}
-      onValuesChange={onValuesChange}
       min={min}
       max={max}
       markerOffsetY={20}

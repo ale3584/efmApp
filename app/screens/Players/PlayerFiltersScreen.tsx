@@ -12,23 +12,28 @@ import {
 import React, { useEffect, useRef, useState } from "react"
 import { FONTS, colors, typography } from "app/theme"
 import { AntDesign } from "@expo/vector-icons"
-import { TwoPointsSlider } from "app/components"
+import { Button, TwoPointsSlider } from "app/components"
 import { Divider, List, Chip } from "react-native-paper"
 import { Checkbox, Select, Box, Center } from "native-base"
 import {
   PlayerAbility,
   PlayerFiltersPosition,
-  PlayerFiltersPStyle,
   PlayerPositionRating,
+  PlayerSkills,
+  PlayerStylesAI,
+  PlayerTeamPlayStyle,
 } from "app/models/PlayerFilters"
 import { useStores } from "app/models"
 import { observer } from "mobx-react-lite"
+import { spacing } from "../../theme"
+import { onSnapshot } from "mobx-state-tree"
+import { pl } from "date-fns/locale"
 
 const { height } = Dimensions.get("window")
 
 interface FiltersScreenProps {
   modalVisible: boolean
-  closeModal: () => void
+  closeModal: (justClose: boolean) => void
 }
 
 export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScreenProps) => {
@@ -37,9 +42,20 @@ export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScre
   const [basicExpanded, setbasicExpanded] = useState(false)
   const [positionExpanded, setpositionExpanded] = useState(false)
   const [abilityExpanded, setabilityExpanded] = useState(false)
-  const [styleExpanded, setstyleExpanded] = useState(false)
   const [skillExpanded, setskillExpanded] = useState(false)
+  const [styleAIExpanded, setstyleAIExpanded] = useState(false)
+  const [posRatingExpanded, setposRatingExpanded] = useState(false)
+  const [teamPlayStyleExpanded, setteamPlayStyleExpanded] = useState(false)
+  const [justClose, setJustClose] = useState(false)
   const { playerFilters } = useStores()
+
+  onSnapshot(playerFilters, (snapshot) => {
+    if (playerFilters.isClose) {
+      return
+    }
+    playerFilters.setIsFiltered(true)
+    return
+  })
 
   useEffect(() => {
     if (showFilterModal) {
@@ -53,7 +69,7 @@ export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScre
         toValue: 0,
         duration: 500,
         useNativeDriver: false,
-      }).start(() => closeModal())
+      }).start(() => closeModal(justClose))
     }
   }, [showFilterModal])
 
@@ -93,10 +109,12 @@ export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScre
           }}
         >
           <TwoPointsSlider
-            values={[18, 45]}
+            values={[playerFilters.playerBasicInfo.age.min, playerFilters.playerBasicInfo.age.max]}
             min={15}
             max={50}
-            onValuesChange={(values) => console.log(values)}
+            onValuesChange={(values) =>
+              playerFilters.playerBasicInfo.age.setValues(values[0], values[1])
+            }
           />
         </View>
       </Section>
@@ -112,10 +130,15 @@ export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScre
           }}
         >
           <TwoPointsSlider
-            values={[130, 210]}
+            values={[
+              playerFilters.playerBasicInfo.height.min,
+              playerFilters.playerBasicInfo.height.max,
+            ]}
             min={100}
             max={227}
-            onValuesChange={(values) => console.log(values)}
+            onValuesChange={(values) =>
+              playerFilters.playerBasicInfo.height.setValues(values[0], values[1])
+            }
           />
         </View>
       </Section>
@@ -130,10 +153,15 @@ export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScre
           }}
         >
           <TwoPointsSlider
-            values={[40, 120]}
+            values={[
+              playerFilters.playerBasicInfo.weight.min,
+              playerFilters.playerBasicInfo.weight.max,
+            ]}
             min={30}
             max={157}
-            onValuesChange={(values) => console.log(values)}
+            onValuesChange={(values) =>
+              playerFilters.playerBasicInfo.weight.setValues(values[0], values[1])
+            }
           />
         </View>
       </Section>
@@ -143,8 +171,10 @@ export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScre
   const handlePressBasic = () => setbasicExpanded(!basicExpanded)
   const handlePressPosition = () => setpositionExpanded(!positionExpanded)
   const handlePressAbility = () => setabilityExpanded(!abilityExpanded)
-  const handlePressStyle = () => setstyleExpanded(!styleExpanded)
   const handlePressSkill = () => setskillExpanded(!skillExpanded)
+  const handlePressStyleAI = () => setstyleAIExpanded(!styleAIExpanded)
+  const handlePressPosRating = () => setposRatingExpanded(!posRatingExpanded)
+  const handlePressTeamPlayStyle = () => setteamPlayStyleExpanded(!teamPlayStyleExpanded)
 
   return (
     <Modal animationType="fade" transparent={true} visible={modalVisible}>
@@ -154,7 +184,12 @@ export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScre
           backgroundColor: colors.transparentBlack,
         }}
       >
-        <TouchableWithoutFeedback onPress={() => setShowFilterModal(false)}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            setShowFilterModal(false)
+            setJustClose(true)
+          }}
+        >
           <View
             style={{
               position: "absolute",
@@ -193,7 +228,12 @@ export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScre
             >
               Filters
             </Text>
-            <TouchableOpacity onPress={() => setShowFilterModal(false)}>
+            <TouchableOpacity
+              onPress={() => {
+                setShowFilterModal(false)
+                setJustClose(true)
+              }}
+            >
               <View style={styles.icon}>
                 <AntDesign name="close" size={20} />
               </View>
@@ -298,10 +338,10 @@ export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScre
             </List.Accordion>
             <List.Accordion
               title="Position Rating"
-              expanded={abilityExpanded}
-              onPress={handlePressAbility}
+              expanded={posRatingExpanded}
+              onPress={handlePressPosRating}
               right={() =>
-                abilityExpanded ? (
+                posRatingExpanded ? (
                   <AntDesign name="up" size={20} />
                 ) : (
                   <AntDesign name="right" size={20} />
@@ -335,10 +375,10 @@ export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScre
             </List.Accordion>
             <List.Accordion
               title="Ability Settings"
-              expanded={skillExpanded}
-              onPress={handlePressSkill}
+              expanded={abilityExpanded}
+              onPress={handlePressAbility}
               right={() =>
-                skillExpanded ? (
+                abilityExpanded ? (
                   <AntDesign name="up" size={20} />
                 ) : (
                   <AntDesign name="right" size={20} />
@@ -371,19 +411,147 @@ export const FiltersScreen = observer(({ modalVisible, closeModal }: FiltersScre
               })}
             </List.Accordion>
             <List.Accordion
-              title="Style Settings"
-              expanded={styleExpanded}
-              onPress={handlePressStyle}
+              title="Team play style Settings"
+              expanded={teamPlayStyleExpanded}
+              onPress={handlePressTeamPlayStyle}
               right={() =>
-                styleExpanded ? (
+                teamPlayStyleExpanded ? (
                   <AntDesign name="up" size={20} />
                 ) : (
                   <AntDesign name="right" size={20} />
                 )
               }
             >
-              <Text></Text>
+              {Object.keys(PlayerTeamPlayStyle).map((key) => {
+                return (
+                  <Section title={PlayerTeamPlayStyle[key]} key={key}>
+                    <View
+                      style={{
+                        alignItems: "center",
+                        flex: 1,
+                      }}
+                    >
+                      <TwoPointsSlider
+                        values={[
+                          playerFilters.teamPlayStyle[key].min,
+                          playerFilters.teamPlayStyle[key].max,
+                        ]}
+                        min={40}
+                        max={99}
+                        onValuesChange={(values) => {
+                          playerFilters.teamPlayStyle[key].setValues(values[0], values[1])
+                        }}
+                      />
+                    </View>
+                  </Section>
+                )
+              })}
             </List.Accordion>
+            <List.Accordion
+              title="Skills Settings"
+              expanded={skillExpanded}
+              onPress={handlePressSkill}
+              right={() =>
+                skillExpanded ? (
+                  <AntDesign name="up" size={20} />
+                ) : (
+                  <AntDesign name="right" size={20} />
+                )
+              }
+            >
+              <View style={{ flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 12 }}>
+                {Object.keys(PlayerSkills).map((key) => {
+                  return (
+                    <Chip
+                      key={key}
+                      mode="outlined"
+                      selected={playerFilters.playerSkills[key].selected}
+                      style={{ margin: 5 }}
+                      onPress={() => playerFilters.playerSkills[key].toggle()}
+                      icon={() => {
+                        if (playerFilters.playerSkills[key].selected) {
+                          return <AntDesign name="check" size={20} />
+                        }
+                        return null
+                      }}
+                    >
+                      {PlayerSkills[key]}
+                    </Chip>
+                  )
+                })}
+              </View>
+            </List.Accordion>
+            <List.Accordion
+              title="AI Style Settings"
+              expanded={styleAIExpanded}
+              onPress={handlePressStyleAI}
+              right={() =>
+                styleAIExpanded ? (
+                  <AntDesign name="up" size={20} />
+                ) : (
+                  <AntDesign name="right" size={20} />
+                )
+              }
+            >
+              <View style={{ flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 12 }}>
+                {Object.keys(PlayerStylesAI).map((key) => {
+                  return (
+                    <Chip
+                      key={key}
+                      mode="outlined"
+                      selected={playerFilters.playerStylesAI[key].selected}
+                      style={{ margin: 5 }}
+                      onPress={() => playerFilters.playerStylesAI[key].toggle()}
+                      icon={() => {
+                        if (playerFilters.playerStylesAI[key].selected) {
+                          return <AntDesign name="check" size={20} />
+                        }
+                        return null
+                      }}
+                    >
+                      {PlayerStylesAI[key]}
+                    </Chip>
+                  )
+                })}
+              </View>
+            </List.Accordion>
+            <Center style={{ flexDirection: "row" }} justifyItems="center">
+              <Button
+                style={styles.button}
+                onPress={() => {
+                  setShowFilterModal(false)
+                  setJustClose(false)
+                }}
+                LeftAccessory={() => (
+                  <AntDesign
+                    name="check"
+                    size={20}
+                    style={{ marginHorizontal: 5, color: "#376AED" }}
+                  />
+                )}
+              >
+                Apply filters
+              </Button>
+              <Button
+                style={styles.button}
+                onPress={() => {
+                  playerFilters.clear()
+                  playerFilters.setIsFiltered(false)
+                  playerFilters.setIsClose(true)
+                  setShowFilterModal(false)
+                  setJustClose(false)
+                }}
+                RightAccessory={() => (
+                  <AntDesign
+                    name="close"
+                    size={20}
+                    style={{ marginHorizontal: 5, color: "#FF2233" }}
+                  />
+                )}
+              >
+                Clear
+              </Button>
+            </Center>
           </ScrollView>
         </Animated.View>
       </View>
@@ -402,5 +570,20 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 5,
     borderColor: "#999999",
     borderWidth: 1,
+  },
+  button: {
+    alignItems: "center",
+    //backgroundColor: "#376AED",
+    borderColor: "#999999",
+    borderRadius: 35,
+    borderWidth: 1,
+    height: 50,
+    justifyContent: "center",
+    marginHorizontal: 5,
+    marginTop: spacing.extraSmall,
+    marginVertical: 10,
+    shadowColor: "#000000",
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
   },
 })

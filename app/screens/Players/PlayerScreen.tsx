@@ -21,6 +21,7 @@ import { useStores } from "app/models"
 import { AntDesign } from "@expo/vector-icons"
 import { createDrawerNavigator } from "@react-navigation/drawer"
 import { FiltersScreen } from "./PlayerFiltersScreen"
+import { getSnapshot } from "mobx-state-tree"
 
 const { height } = Dimensions.get("window")
 const ITEM_HEIGHT = height * 0.18
@@ -38,6 +39,7 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
     const {
       playerStore,
       playerStore: { IsEndReached, IsLoading },
+      playerFilters,
     } = useStores()
 
     const onfetchPlayers = async () => {
@@ -45,9 +47,14 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
         return
       }
 
-      await playerStore.fetchPlayers()
+      if (playerFilters.isFiltered) {
+        await playerStore.fetchPlayersWithFilters(getSnapshot(playerFilters))
+      } else {
+        await playerStore.fetchPlayers()
+      }
       await playerStore.setIsEndReached(false)
       await setPage(page + 1)
+      await playerStore.setIsLoading(false)
     }
 
     useEffect(() => {
@@ -151,7 +158,17 @@ export const PlayerScreen: FC<StackScreenProps<AppStackScreenProps, "Player">> =
           />
 
           {modalVisible && (
-            <FiltersScreen modalVisible={modalVisible} closeModal={() => setModalVisible(false)} />
+            <FiltersScreen
+              modalVisible={modalVisible}
+              closeModal={(justClose) => {
+                if (justClose) {
+                  setModalVisible(false)
+                  return
+                }
+                setModalVisible(false)
+                onfetchPlayers()
+              }}
+            />
           )}
           {/* <View style={styles.bg} /> */}
         </View>
