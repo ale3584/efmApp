@@ -163,7 +163,36 @@ export const PlayerStoreModel = types
     },
 
     async fetchPlayersWithFilters(playerFilters: any) {
-      console.log(playerFilters)
+      const authStore = getParent<RootStore>(self).authStore
+      self.setIsLoading(true)
+      // if(authStore.isTokenValid){
+      const authenticationApi = new AuthenticationApi(api, self)
+      try {
+        const response = await authenticationApi.getPlayersWithFilters(playerFilters)
+        if (response.kind === "ok") {
+          // console.log(response.players)
+          await self.setIsLoading(false)
+          await self.setIsEndReached(false)
+          await self.setError(null)
+          await self.setPLayers(response.players)
+        } else if (response.kind === "unauthorized") {
+          await self.setIsLoading(false)
+          await self.setIsEndReached(false)
+          await self.setPlayer(null)
+          await authStore.logout()
+        } else {
+          // console.log(response)
+          await self.setIsLoading(false)
+          await self.setIsEndReached(false)
+          await self.setPlayer(null)
+          await self.setError(null)
+          console.tron.error(`Error fetching player: ${JSON.stringify(response)}`, [])
+        }
+      } catch (error) {
+        await self.setIsLoading(false)
+        await self.setIsEndReached(false)
+        await self.setError(error.message)
+      }
     },
 
     async appendPlayersWithFilters(playerFilters: any, page: number) {

@@ -23,7 +23,7 @@ export class AuthenticationApi {
     this.api.apisauce.addAsyncRequestTransform((request) => async () => {
       const authToken = await storage.loadString("authToken")
       const refreshToken = await storage.loadString("refreshToken")
-      if(request.url.startsWith("/auth")){
+      if (request.url.startsWith("/auth")) {
         delete request.headers.refreshToken
         delete request.headers.Authorization
       }
@@ -53,8 +53,8 @@ export class AuthenticationApi {
           await storage.remove("refreshToken")
           await this.authStore.logout()
         } else {
-          await storage.saveString("authToken",response.data.accessToken)
-          await storage.saveString("refreshToken",response.data.refreshToken)
+          await storage.saveString("authToken", response.data.accessToken)
+          await storage.saveString("refreshToken", response.data.refreshToken)
           // retry
           const data = await this.api.apisauce.any(response.config)
           // replace data
@@ -105,13 +105,17 @@ export class AuthenticationApi {
       const response: ApiResponse<any> = await this.api.apisauce.post("/auth/signup", {
         username: username,
         email: email,
-        password: password
+        password: password,
       })
       __DEV__ && console.tron.log(response)
 
       if (!response.ok) {
         const problem = getGeneralApiProblem(response)
-        if (problem) return { kind: problem.kind, message:  "messageList" in response.data ? response.data.messageList : [] }     
+        if (problem)
+          return {
+            kind: problem.kind,
+            message: "messageList" in response.data ? response.data.messageList : [],
+          }
       }
 
       return { kind: "ok", message: response.data.message }
@@ -195,6 +199,41 @@ export class AuthenticationApi {
     }
   }
 
+  async getPlayersWithFilters(
+    playerFilters: any,
+  ): Promise<{ kind: "ok"; players: PlayerSnapshotIn[] } | GeneralApiProblem> {
+    const response: ApiResponse<ApiPlayersResponse> = await this.api.apisauce.post(
+      "/players/search",
+      {
+        page: 0,
+        ...playerFilters,
+      },
+    )
+
+    // the typical ways to die when calling an api
+    if (!response.ok) {
+      const problem = getGeneralApiProblem(response)
+      if (problem) return problem
+    }
+
+    // transform the data into the format we are expecting
+    try {
+      const rawData = response.data
+
+      // This is where we transform the data into the shape we expect for our MST model.
+      const players: PlayerSnapshotIn[] = rawData.content.map((raw) => ({
+        ...raw,
+      }))
+
+      return { kind: "ok", players }
+    } catch (e) {
+      if (__DEV__) {
+        console.tron.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
+      }
+      return { kind: "bad-data" }
+    }
+  }
+
   async getPlayer(
     playerid: number,
   ): Promise<{ kind: "ok"; player: PlayerSnapshotIn } | GeneralApiProblem> {
@@ -208,10 +247,10 @@ export class AuthenticationApi {
 
     // transform the data into the format we are expecting
     try {
-      const rawData = response.data;
+      const rawData = response.data
 
       // This is where we transform the data into the shape we expect for our MST model.
-      const player: PlayerSnapshotIn = rawData;
+      const player: PlayerSnapshotIn = rawData
 
       return { kind: "ok", player }
     } catch (e) {

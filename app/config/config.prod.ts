@@ -7,5 +7,5 @@
  */
 export default {
   // API_URL: "http://192.168.88.30:31979/api/",
-  API_URL: "http://superleague.pp.ua:31979/api/",
+  API_URL: "http://8fde090f5202.sn.mynetname.net:31979/api/",
 }
