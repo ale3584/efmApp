@@ -448,6 +448,8 @@ export enum PlayerStylesAI {
   longrange = "Long Range",
 }
 
+export const playedPositions = ["C", "B", "A"]
+
 export const PlayerFiltersModel = types
   .model("PlayerFilters", {
     playedPositions: PlayerPositionModel,

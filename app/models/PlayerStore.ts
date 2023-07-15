@@ -4,6 +4,58 @@ import { PlayerModel } from "./Player"
 import { api } from "../services/api"
 import { AuthenticationApi } from "app/services/api/authApi"
 import { RootStore } from "./RootStore"
+import { playedPositions } from "./PlayerFilters"
+
+function filterSelectedPositions(snapshot: any) {
+  const result = {}
+  for (const property in snapshot) {
+    if (snapshot[property] && snapshot[property].selected) {
+      result[property + "Min"] = snapshot[property].min
+      result[property + "Max"] = snapshot[property].max
+    }
+  }
+  return result
+}
+
+function filterSelectedPositionsString(snapshot: any) {
+  const result = {}
+  for (const property in snapshot) {
+    if (snapshot[property] && snapshot[property].selected) {
+      result[property + "Min"] = playedPositions.indexOf(snapshot[property].min)
+      result[property + "Max"] = playedPositions.indexOf(snapshot[property].max)
+    }
+  }
+  return result
+}
+
+function filterSelected(snapshot: any) {
+  const result = {}
+  for (const property in snapshot) {
+    if (snapshot[property] instanceof Object && !(snapshot[property] instanceof Array)) {
+      // Обработка объектов в соответствии с их структурой
+      if (property === "playedPositions") {
+        const subResult = filterSelectedPositionsString(snapshot[property])
+        if (Object.keys(subResult).length > 0) {
+          result[property] = subResult
+        }
+      } else if (property === "playedPositionsRating" || property === "teamPlayStyle") {
+        const subResult = filterSelectedPositions(snapshot[property])
+        if (Object.keys(subResult).length > 0) {
+          result[property] = subResult
+        }
+      } else {
+        const subResult = filterSelected(snapshot[property])
+        if (Object.keys(subResult).length > 0) {
+          result[property] = subResult
+        }
+      }
+    } else if (snapshot[property] && snapshot[property].selected) {
+      result[property] = snapshot[property].value
+    }
+  }
+
+  return result
+}
 
 /**
  * Model description here for TypeScript hints.
@@ -163,12 +215,14 @@ export const PlayerStoreModel = types
     },
 
     async fetchPlayersWithFilters(playerFilters: any) {
+      let playerFiltersDTO = {}
+      playerFiltersDTO = filterSelected(playerFilters)
       const authStore = getParent<RootStore>(self).authStore
       self.setIsLoading(true)
       // if(authStore.isTokenValid){
       const authenticationApi = new AuthenticationApi(api, self)
       try {
-        const response = await authenticationApi.getPlayersWithFilters(playerFilters)
+        const response = await authenticationApi.getPlayersWithFilters(playerFiltersDTO)
         if (response.kind === "ok") {
           // console.log(response.players)
           await self.setIsLoading(false)

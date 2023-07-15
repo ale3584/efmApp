@@ -209,7 +209,6 @@ export class AuthenticationApi {
         ...playerFilters,
       },
     )
-
     // the typical ways to die when calling an api
     if (!response.ok) {
       const problem = getGeneralApiProblem(response)
